@@ -2,7 +2,6 @@ package org.echowiki.core.domain;
 
 import com.sun.istack.Nullable;
 
-import java.util.Iterator;
 import java.util.List;
 
 public interface Tree<E extends Comparable<E>> extends Iterable<Tree<E>> {
@@ -22,7 +21,8 @@ public interface Tree<E extends Comparable<E>> extends Iterable<Tree<E>> {
         return node;
     }
 
-    @Nullable Tree<E> getParent();
+    @Nullable
+    Tree<E> getParent();
 
     void setParent(@Nullable Tree<E> parent);
 
@@ -31,4 +31,14 @@ public interface Tree<E extends Comparable<E>> extends Iterable<Tree<E>> {
     void addChild(Tree<E> child);
 
     void removeChild(Tree<E> child);
+
+    List<E> getDescendants(Traversal traversal);
+
+    /**
+     * represents the order of the child nodes to fetching from {@link Tree}.
+     */
+    enum Traversal {
+        LEVEL, PRE_ORDER, POST_ORDER, IN_ORDER
+    }
+
 }

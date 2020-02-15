@@ -22,9 +22,12 @@ public class EntityDocument extends AbstractTree<Document> implements Document, 
 
     private String title;
 
-    @ManyToOne
+    @ManyToMany
+    @JoinTable(name = "category_document",
+        joinColumns = @JoinColumn(name = "document_id"),
+        inverseJoinColumns = @JoinColumn(name = "category_id"))
     @JoinColumn(name = "category_id")
-    private EntityCategory category;
+    private List<EntityCategory> categories;
 
     @OneToOne(mappedBy = "document")
     private EntityRevision revision;
@@ -35,7 +38,7 @@ public class EntityDocument extends AbstractTree<Document> implements Document, 
     @JoinColumn(name = "parent_id")
     private EntityDocument parent;
 
-    @OneToMany(mappedBy = "parent")
+    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
     private List<EntityDocument> children;
 
     @Embedded
@@ -43,12 +46,17 @@ public class EntityDocument extends AbstractTree<Document> implements Document, 
 
     @Override
     public boolean isTrunk() {
-        return revision.isTrunk();
+        return revision.isHead();
     }
 
     @Override
     public List<Topic> getTopics() {
         return null;
+    }
+
+    @Override
+    public List<Category> getCategories() {
+        return new ArrayList<>(categories);
     }
 
     @Override

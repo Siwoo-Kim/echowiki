@@ -1,27 +1,36 @@
 drop table revision;
+drop table category_document_join;
 drop table document;
 drop table category;
 
 -- CATEGORY TABLE
 create table category (
-                          id int identity(1, 1) primary key,
-                          title varchar(50) not null unique,
-                          parent_id int,
-                          created datetime default getdate(),
-                          updated datetime,
-                          deleted datetime,
-                          constraint category_parent_fk foreign key (parent_id) references category(id)
+      id int identity(1, 1) primary key,
+      title varchar(50) not null unique,
+      parent_id int,
+      created datetime default getdate(),
+      updated datetime,
+      deleted datetime,
+      constraint category_parent_fk foreign key (parent_id) references category(id)
 );
 
 create table document (
-                          id int identity (1, 1) primary key,
-                          title varchar(250) not null,
-                          category_id int not null,
-                          parent_id int,
-                          created datetime default getdate(),
-                          updated datetime,
-                          deleted datetime,
-                          constraint document_category_fk foreign key (category_id) references category(id),
+      id int identity (1, 1) primary key,
+      title varchar(250) not null,
+      category_id int not null,
+      parent_id int,
+      created datetime default getdate(),
+      updated datetime,
+      deleted datetime,
+      constraint document_category_fk foreign key (category_id) references category(id),
+);
+
+create table category_document_join (
+    document_id int,
+    category_id int,
+    primary key (document_id, category_id),
+    constraint category_document_join_document_fk foreign key (document_id) references document(id),
+    constraint category_document_join_category_fk foreign key (category_id) references category(id)
 );
 
 create table revision (

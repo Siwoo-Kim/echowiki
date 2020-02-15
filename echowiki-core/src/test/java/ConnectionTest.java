@@ -21,6 +21,5 @@ public class ConnectionTest {
     @Test
     public void test() {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-
     }
 }

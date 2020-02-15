@@ -19,7 +19,7 @@ public interface Document extends Tree<Document>, Comparable<Document> {
      *
      * @return
      */
-    Category getCategory();
+    List<Category> getCategories();
 
     /**
      * is the {@link Document} HEAD?

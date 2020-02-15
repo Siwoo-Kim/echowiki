@@ -3,11 +3,14 @@ package com.echowiki.core.entity;
 import org.echowiki.core.configuration.CoreConfiguration;
 import org.echowiki.core.configuration.DatabaseConfiguration;
 import org.echowiki.core.domain.Category;
+import org.echowiki.core.domain.Tree;
 import org.echowiki.core.entity.EntityCategory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringRunner;
+
+import java.util.List;
 
 import static org.hamcrest.CoreMatchers.hasItems;
 import static org.hamcrest.CoreMatchers.not;
@@ -151,5 +154,54 @@ public class UnitTestEntityCategory {
         assertThat(parent.getChildren(), hasItems(child_level2_2));
         assertNull(child_level2_1.getParent());
         assertEquals(child_level2_2.getParent(), parent);
+    }
+
+    @Test
+    public void unitTestGetDescendants() {
+        Category parent = EntityCategory.builder()
+                .id(1L)
+                .title("TEST1")
+                .build();
+        Category child_level2_1 = EntityCategory.builder()
+                .id(2L)
+                .title("TEST2-1")
+                .build();
+        Category child_level2_2 = EntityCategory.builder()
+                .id(3L)
+                .title("TEST2-2")
+                .build();
+        Category child_level2_3 = EntityCategory.builder()
+                .id(3L)
+                .title("TEST2-3")
+                .build();
+        Category child_level3_1 = EntityCategory.builder()
+                .id(4L)
+                .title("TEST3-1")
+                .build();
+        Category child_level3_2 = EntityCategory.builder()
+                .id(5L)
+                .title("TEST3-2")
+                .build();
+        Category child_level3_3 = EntityCategory.builder()
+                .id(6L)
+                .title("TEST3-3")
+                .build();
+        Category child_level3_4 = EntityCategory.builder()
+                .id(7L)
+                .title("TEST3-4")
+                .build();
+
+        parent.addChild(child_level2_1);
+        parent.addChild(child_level2_2);
+        parent.addChild(child_level2_3);
+        child_level2_1.addChild(child_level3_1);
+        child_level2_2.addChild(child_level3_2);
+        child_level2_3.addChild(child_level3_3);
+        child_level2_3.addChild(child_level3_4);
+
+        List<Category> results = parent.getDescendants(Tree.Traversal.LEVEL);
+        assertArrayEquals(results.toArray(new Category[0]),
+                new Category[]{parent, child_level2_1, child_level2_2, child_level2_3,
+                        child_level3_1, child_level3_2, child_level3_3, child_level3_4});
     }
 }

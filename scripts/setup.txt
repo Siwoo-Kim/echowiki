@@ -1,0 +1,2 @@
+DB Encoding 관련
+    https://docs.ncloud.com/ko/database/database-2-3.html

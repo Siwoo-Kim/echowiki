@@ -19,16 +19,20 @@ import java.util.Objects;
 @Builder
 public class EntityCategory extends AbstractTree<Category> implements Category, Persistable, Auditable {
 
-    @OneToMany(mappedBy = "parent")
-    private final List<EntityCategory> children = new ArrayList<>();
     @Id
     @GeneratedValue
     private Long id;
+
     private String title;
+
     private EntityEventTime eventTime;
+
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private EntityCategory parent;
+
+    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
+    private final List<EntityCategory> children = new ArrayList<>();
 
     @Override
     Tree<? extends Category> parent() {

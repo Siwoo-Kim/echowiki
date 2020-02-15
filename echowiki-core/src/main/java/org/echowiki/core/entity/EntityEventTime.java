@@ -23,7 +23,7 @@ public class EntityEventTime implements EventTime {
     @Column(name = "deleted")
     private LocalDateTime deletion;
 
-    public static EventTime newInstance() {
+    public static EntityEventTime newInstance() {
         return builder().creation(LocalDateTime.now()).build();
     }
 }
