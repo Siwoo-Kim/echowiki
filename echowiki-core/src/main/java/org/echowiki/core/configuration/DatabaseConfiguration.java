@@ -28,11 +28,11 @@ public class DatabaseConfiguration {
     @Value("${db.url}")
     private String DB_URL;
 
-    @Value("${db.password}")
-    private String DB_PASSWORD;
-
     @Value("${db.username}")
     private String DB_USERNAME;
+
+    @Value("${db.password}")
+    private String DB_PASSWORD;
 
     @Value("${hibernate.entity.package}")
     private String HIBERNATE_ENTITY_PACKAGE;
@@ -65,7 +65,7 @@ public class DatabaseConfiguration {
         em.setPackagesToScan(HIBERNATE_ENTITY_PACKAGE);
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", HIBERNATE_DIALECT);
-        properties.setProperty("hibernate.hbm2ddl.auto", HIBERNATE_HBM2DDL_AUTO);
+        //properties.setProperty("hibernate.hbm2ddl.auto", HIBERNATE_HBM2DDL_AUTO);
         properties.setProperty("hibernate.show_sql", HIBERNATE_SHOW_SQL);
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);

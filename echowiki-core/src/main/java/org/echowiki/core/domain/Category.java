@@ -1,5 +1,6 @@
 package org.echowiki.core.domain;
 
+import javax.transaction.TransactionManager;
 import java.util.Comparator;
 
 public interface Category extends Comparable<Category>, Tree<Category> {
@@ -17,4 +18,5 @@ public interface Category extends Comparable<Category>, Tree<Category> {
         assert o != null;
         return DEFAULT_COMPARATOR.compare(this, o);
     }
+
 }

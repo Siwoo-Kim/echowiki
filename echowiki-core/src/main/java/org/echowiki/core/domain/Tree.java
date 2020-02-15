@@ -15,8 +15,8 @@ public interface Tree<E extends Comparable<E>> extends Iterable<Tree<E>> {
         return getChildren() == null || getChildren().isEmpty();
     }
 
-    default Tree<? extends E> getRoot() {
-        Tree<? extends E> node = getParent();
+    default Tree<E> getRoot() {
+        Tree<E> node = getParent();
         while (!node.isRoot())
             node = node.getRoot();
         return node;
@@ -24,15 +24,11 @@ public interface Tree<E extends Comparable<E>> extends Iterable<Tree<E>> {
 
     @Nullable Tree<E> getParent();
 
-    void setParent(@Nullable Tree<? extends E> parent);
+    void setParent(@Nullable Tree<E> parent);
 
     List<Tree<E>> getChildren();
 
-    void addChild(Tree<? extends E> child);
+    void addChild(Tree<E> child);
 
-    void removeChild(Tree<? extends E> child);
-
-    default Iterator<Tree<E>> iterator() {
-        return getChildren().iterator();
-    }
+    void removeChild(Tree<E> child);
 }

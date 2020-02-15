@@ -1,8 +1,11 @@
 package org.echowiki.core.domain;
 
+import java.util.Comparator;
 import java.util.List;
 
 public interface Document extends Tree<Document>, Comparable<Document> {
+
+    Comparator<Document> DEFAULT_COMPARATOR = Comparator.comparing(Document::getTitle);
 
     /**
      * returns the title of the {@link Document}
@@ -32,4 +35,8 @@ public interface Document extends Tree<Document>, Comparable<Document> {
      */
     List<Topic> getTopics();
 
+    @Override
+    default int compareTo(Document o) {
+        return DEFAULT_COMPARATOR.compare(this, o);
+    }
 }

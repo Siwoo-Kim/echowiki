@@ -8,47 +8,41 @@ import org.echowiki.core.meta.Persistable;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
-@Getter @ToString(of = {"id", "title", "eventTime"})
-@EqualsAndHashCode(of = {"id", "title"})
+@Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-@Entity(name = "Category") @Table(name = "category") @Builder
-public class EntityCategory implements Category, Persistable, Auditable {
+@Entity(name = "Category")
+@Table(name = "category")
+@Builder
+public class EntityCategory extends AbstractTree<Category> implements Category, Persistable, Auditable {
 
-    @Id @GeneratedValue
+    @OneToMany(mappedBy = "parent")
+    private final List<EntityCategory> children = new ArrayList<>();
+    @Id
+    @GeneratedValue
     private Long id;
-
     private String title;
-
     private EntityEventTime eventTime;
-
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private EntityCategory parent;
 
-    @OneToMany(mappedBy = "parent")
-    private final List<EntityCategory> children = new ArrayList<>();
-
     @Override
-    public void setParent(Tree<? extends Category> parent) {
-        if (parent == null)
-            this.parent = null;
-        else {
-            checkArgument(parent instanceof EntityCategory);
-            EntityCategory p = (EntityCategory) parent;
-            p.addChild(this);
-        }
+    Tree<? extends Category> parent() {
+        return parent;
     }
 
-    public EntityCategory getParent() {
-        return parent;
+    @Override
+    List children() {
+        return children;
+    }
+
+    @Override
+    void parent(Tree<? extends Category> parent) {
+        this.parent = (EntityCategory) parent;
     }
 
     public List<Tree<Category>> getChildren() {
@@ -56,26 +50,24 @@ public class EntityCategory implements Category, Persistable, Auditable {
     }
 
     @Override
-    public void addChild(Tree<? extends Category> child) {
-        checkNotNull(child);
-        checkArgument(child instanceof EntityCategory);
-
-        EntityCategory c = (EntityCategory) child;
-        if (!children.contains(child))
-            children.add(c);
-        if (!Objects.equals(c.parent, this))
-            c.parent = this;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EntityCategory that = (EntityCategory) o;
+        return id.equals(that.id) &&
+                title.equals(that.title);
     }
 
     @Override
-    public void removeChild(Tree<? extends Category> child) {
-        if (child == null) return;
-        checkArgument(child instanceof EntityCategory);
-
-        EntityCategory c = (EntityCategory) child;
-        children.remove(c);
-        if (Objects.equals(c.parent, this))
-            c.setParent(null);
+    public int hashCode() {
+        return Objects.hash(id, title);
     }
 
+    @Override
+    public String toString() {
+        return "EntityCategory{" +
+                "id=" + id +
+                ", title='" + title + '\'' +
+                '}';
+    }
 }
