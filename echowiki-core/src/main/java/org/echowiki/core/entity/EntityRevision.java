@@ -52,7 +52,9 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
     @Embedded
     private EntityEventTime eventTime;
 
-    public static EntityRevision newMasterInstance(Document document, String commitBy) {
+    private String message;
+
+    public static EntityRevision newMasterInstance(Document document, String commitBy, String message) {
         checkNotNull(document);
         checkArgument(!Strings.isNullOrEmpty(commitBy));
         return new EntityRevision(null,
@@ -60,7 +62,7 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
                 null,
                 (EntityDocument) document,
                 commitBy,
-                EntityEventTime.newInstance());
+                EntityEventTime.newInstance(), message);
     }
 
     /**
@@ -71,7 +73,7 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
      * @param commitBy
      * @return
      */
-    public static Revision fromTrunk(Revision trunk, Document document, String commitBy) {
+    public static Revision fromTrunk(Revision trunk, Document document, String commitBy, String message) {
         checkNotNull(trunk);
         checkArgument(!Strings.isNullOrEmpty(commitBy));
         checkArgument(trunk.isTrunk(), String.format("Given [%s] is not trunk.", trunk));
@@ -83,7 +85,7 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
                 null,
                 (EntityDocument) document,
                 commitBy,
-                EntityEventTime.newInstance());
+                EntityEventTime.newInstance(), message);
         entity.next = instance;
         return instance;
     }
@@ -111,6 +113,11 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
     @Override
     public String commitBy() {
         return commitBy;
+    }
+
+    @Override
+    public String getMessage() {
+        return null;
     }
 
     @Override

@@ -3,6 +3,7 @@ package org.echowiki.core.entity;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.echowiki.core.domain.Topic;
 import org.echowiki.core.domain.Tree;
 
 import java.util.*;
@@ -62,6 +63,10 @@ public abstract class AbstractTree<E extends Comparable<E>> implements Tree<E> {
             this.parent(parent);
             parent.addChild(this);
         }
+    }
+
+    public List<Tree<E>> getChildren() {
+        return new ArrayList<>(children());
     }
 
     @Override

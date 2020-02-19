@@ -3,13 +3,16 @@ package org.echowiki.core.entity;
 import lombok.*;
 import org.echowiki.core.domain.*;
 import org.echowiki.core.meta.Persistable;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
+import org.springframework.data.repository.cdi.Eager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-
-@Getter
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
 @Entity(name = "Document")
@@ -17,28 +20,32 @@ import java.util.List;
 @Builder
 public class EntityDocument extends AbstractTree<Document> implements Document, Auditable, Persistable {
 
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
     private Long id;
 
     private String title;
 
     @ManyToMany
     @JoinTable(name = "category_document",
-        joinColumns = @JoinColumn(name = "document_id"),
-        inverseJoinColumns = @JoinColumn(name = "category_id"))
+            joinColumns = @JoinColumn(name = "document_id"),
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
     @JoinColumn(name = "category_id")
     private List<EntityCategory> categories;
 
     @OneToOne(mappedBy = "document")
     private EntityRevision revision;
 
-    //private List<Topic> topics;
+    @OneToMany(mappedBy = "document", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
+    private List<EntityTopic> topics;
 
     @ManyToOne
     @JoinColumn(name = "parent_id")
     private EntityDocument parent;
 
     @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
+    @Fetch(FetchMode.SUBSELECT)
     private List<EntityDocument> children;
 
     @Embedded
@@ -52,6 +59,11 @@ public class EntityDocument extends AbstractTree<Document> implements Document, 
     @Override
     public List<Topic> getTopics() {
         return null;
+    }
+
+    @Override
+    public String getTitle() {
+        return title;
     }
 
     @Override
@@ -74,7 +86,8 @@ public class EntityDocument extends AbstractTree<Document> implements Document, 
         this.parent = (EntityDocument) parent;
     }
 
-    public List<Tree<Document>> getChildren() {
-        return new ArrayList<>(children);
+    @Override
+    public EventTime getEventTime() {
+        return eventTime;
     }
 }

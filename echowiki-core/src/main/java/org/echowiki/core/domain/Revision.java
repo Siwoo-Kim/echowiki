@@ -38,4 +38,11 @@ public interface Revision {
      */
     String commitBy();
 
+    /**
+     * returns commit message.
+     *
+     * @return
+     */
+    String getMessage();
+
 }
