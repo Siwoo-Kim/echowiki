@@ -13,7 +13,8 @@ public class UnitTestEntityRevision {
     public void unitTestNewMasterInstance() {
         EntityDocument mockDocument = EntityDocument.builder().build();
         String mockCommitBy = "mock";
-        Revision revision = EntityRevision.newMasterInstance(mockDocument, mockCommitBy);
+        String mockMessage = "message";
+        Revision revision = EntityRevision.newMasterInstance(mockDocument, mockCommitBy, mockMessage);
         assertTrue(revision.isHead());
         assertEquals(revision.getVersion(), "rev{1}");
         assertEquals(revision.commitBy(), "mock");
@@ -23,14 +24,15 @@ public class UnitTestEntityRevision {
     public void unitTestFromTrunk() {
         EntityDocument mockDocument = EntityDocument.builder().build();
         String mockCommitBy = "mock";
-        Revision revision = EntityRevision.newMasterInstance(mockDocument, mockCommitBy);
+        String mockMessage = "message";
+        Revision revision = EntityRevision.newMasterInstance(mockDocument, mockCommitBy, mockMessage);
 
         assertTrue(revision.isHead());
         assertTrue(revision.isTrunk());
         assertEquals(revision.getVersion(), "rev{1}");
         assertEquals(revision.commitBy(), "mock");
 
-        Revision revision1 = EntityRevision.fromTrunk(revision, mockDocument, mockCommitBy);
+        Revision revision1 = EntityRevision.fromTrunk(revision, mockDocument, mockCommitBy, mockMessage);
 
         assertFalse(revision.isHead());
         assertTrue(revision.isTrunk());
@@ -38,7 +40,7 @@ public class UnitTestEntityRevision {
         assertEquals(revision.commitBy(), "mock");
         assertEquals(revision.getNext(), revision1);
 
-        Revision revision2 = EntityRevision.fromTrunk(revision1, mockDocument, mockCommitBy);
+        Revision revision2 = EntityRevision.fromTrunk(revision1, mockDocument, mockCommitBy, mockMessage);
 
         assertFalse(revision.isHead());
         assertTrue(revision.isTrunk());
@@ -55,18 +57,19 @@ public class UnitTestEntityRevision {
         assertEquals(revision2.getVersion(), "rev{3}");
         assertNull(revision2.getNext());
 
-        EntityRevision.fromTrunk(revision1, mockDocument, mockCommitBy);
+        EntityRevision.fromTrunk(revision1, mockDocument, mockCommitBy, mockMessage);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void unitTestFromTrunkWhenGivenRevisionIsNotTrunk() {
         EntityDocument mockDocument = EntityDocument.builder().build();
         String mockCommitBy = "mock";
-        Revision revision = EntityRevision.newMasterInstance(mockDocument, mockCommitBy);
-        Revision revision1 = EntityRevision.fromTrunk(revision, mockDocument, mockCommitBy);
+        String mockMessage = "message";
+        Revision revision = EntityRevision.newMasterInstance(mockDocument, mockCommitBy, mockMessage);
+        Revision revision1 = EntityRevision.fromTrunk(revision, mockDocument, mockCommitBy, mockMessage);
 
         assertFalse(revision.isTrunk());
         assertTrue(revision1.isTrunk());
-        EntityRevision.fromTrunk(revision, mockDocument, mockCommitBy);
+        EntityRevision.fromTrunk(revision, mockDocument, mockCommitBy, mockMessage);
     }
 }

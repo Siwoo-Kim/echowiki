@@ -2,6 +2,8 @@ drop table revision;
 drop table category_document_join;
 drop table document;
 drop table category;
+drop table topic;
+
 
 -- CATEGORY TABLE
 create table category (
@@ -34,28 +36,29 @@ create table category_document_join (
 );
 
 create table revision (
-    version varchar(100) primary key,
-    master_version varchar(100),
+    id int identity (1, 1) primary key,
+    next_id int,
+    version varchar(100),
     document_id int not null,
     commit_by varchar(50) not null,
+    message varchar(200) not null,
     created datetime default getdate(),
     updated datetime,
     deleted datetime,
-    constraint revision_master_fk foreign key (master_version) references revision(version),
+    constraint revision_master_fk foreign key (next_id) references revision(id),
     constraint document_revision_fk foreign key (document_id) references document(id)
 );
 
-insert into category VALUES ('TEST-1', null, null, null, null);
-insert into category VALUES ('TEST-1-1', 1, null, null, null);
-insert into category VALUES ('TEST-1-2', 1, null, null, null);
-insert into category VALUES ('TEST-1-3', 1, null, null, null);
-insert into category VALUES ('TEST-1-4', 1, null, null, null);
-insert into category VALUES ('TEST-1-5', 1, null, null, null);
-insert into category VALUES ('TEST-1-6', 1, null, null, null);
-
-insert into category VALUES ('TEST-1-1-1', 2, null, null, null);
-insert into category VALUES ('TEST-1-1-2', 2, null, null, null);
-insert into category VALUES ('TEST-1-1-3', 2, null, null, null);
-insert into category VALUES ('TEST-1-2-1', 3, null, null, null);
-insert into category VALUES ('TEST-1-2-2', 3, null, null, null);
-insert into category VALUES ('TEST-1-2-3', 3, null, null, null);
+create table topic (
+    id int identity (1, 1) primary key,
+    topic_index varchar(100) not null,
+    heading varchar(100) not null,
+    parent_id int,
+    document_id int not null,
+    paragraph varchar(max),
+    created datetime default getdate(),
+    updated datetime,
+    deleted datetime,
+    constraint topic_parent_fk foreign key (parent_id) references topic(id),
+    constraint topic_document_fk foreign key (document_id) references topic(id),
+);
