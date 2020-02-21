@@ -1,12 +1,12 @@
 package com.echowiki.core.expression.parser;
 
-import org.echowiki.core.expression.parser.EchoExpressionParser;
-import org.echowiki.core.expression.parser.ParsedElement;
+import org.echowiki.core.expression.*;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.CoreMatchers.instanceOf;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.*;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class UnitTestEchoExpressionParser {
 
@@ -14,59 +14,110 @@ public class UnitTestEchoExpressionParser {
 
     @Test
     public void unitTestParseTextExpression() {
-        String raw = "|| {{text-size(10):텍스트1}}: {{text-color(orange):텍스트2}} or  → ~~취소선 1~~ || ||";
+        String exp = "{+:이것은 각주입니다.}";
+        EchoExpressionParser parser = new EchoExpressionParser();
+        Expression expression = parser.parse(exp);
+        assertEquals(expression.expression(), "+");
+        assertEquals(expression.value(), "이것은 각주입니다.");
+        assertEquals(expression.expressionString(), "{+:이것은 각주입니다.}");
+        assertThat(expression, is(instanceOf(EchoNoteExpression.class)));
+        assertNull(expression.arguments());
+        expression = expression.innerExpression();
+        assertThat(expression, is(instanceOf(LiteralExpression.class)));
+        assertEquals(expression.value(), "이것은 각주입니다.");
 
-        List<ParsedElement> elements = echoExpressionParser.parse(raw);
-        assertEquals(elements.get(0).raw(), "{{text-size(10):텍스트1}}");
-        assertEquals(elements.get(0).expression(), "text-size(10)");
-        assertEquals(elements.get(0).value(), "텍스트1");
+        exp = "{!:'굵은글씨'}";
+        parser = new EchoExpressionParser();
+        expression = parser.parse(exp);
+        assertEquals(expression.expression(), "!");
+        assertEquals(expression.value(), "'굵은글씨'");
+        assertEquals(expression.expressionString(), "{!:'굵은글씨'}");
+        assertThat(expression, is(instanceOf(EchoTextExpression.class)));
+        assertNull(expression.arguments());
+        expression = expression.innerExpression();
+        assertThat(expression, is(instanceOf(LiteralExpression.class)));
+        assertEquals(expression.value(), "'굵은글씨'");
 
-        assertEquals(elements.get(1).raw(), "{{text-color(orange):텍스트2}}");
-        assertEquals(elements.get(1).expression(), "text-color(orange)");
-        assertEquals(elements.get(1).value(), "텍스트2");
+        exp = "{!:-{!:'굵은글씨'}-}";
+        expression = parser.parse(exp);
+        assertEquals(expression.expression(), "!");
+        assertEquals(expression.value(), "-{!:'굵은글씨'}-");
+        assertEquals(expression.expressionString(), "{!:-{!:'굵은글씨'}-}");
+        assertNull(expression.arguments());
+        expression = expression.innerExpression();
+        assertEquals(expression.expression(), "!");
+        assertEquals(expression.value(), "'굵은글씨'");
+        assertEquals(expression.expressionString(), "{!:'굵은글씨'}");
+        assertThat(expression, is(instanceOf(EchoTextExpression.class)));
+        assertNull(expression.arguments());
+        expression = expression.innerExpression();
+        assertThat(expression, is(instanceOf(LiteralExpression.class)));
+        assertEquals(expression.value(), "'굵은글씨'");
 
-        raw = "|| {{!:'굵게'}} → '''굵게 ''' [* 큰따옴표(\") 한 개, 작은따옴표(')한 개가 아니라 {{!:`작은따옴표`}}(')를 세 번 입력한 상태입니다.] ||\n";
-        elements = echoExpressionParser.parse(raw);
-        assertEquals(elements.get(0).raw(), "{{!:'굵게'}}");
-        assertEquals(elements.get(0).expression(), "!");
-        assertEquals(elements.get(0).value(), "'굵게'");
+        exp = "{!:`{!size(10):색칠되고 italic's 글씨체}`}";
+        expression = parser.parse(exp);
+        assertEquals(expression.expression(), "!");
+        assertEquals(expression.value(), "`{!size(10):색칠되고 italic's 글씨체}`");
+        assertEquals(expression.expressionString(), "{!:`{!size(10):색칠되고 italic's 글씨체}`}");
+        assertNull(expression.arguments());
+        expression = expression.innerExpression();
+        assertEquals(expression.expression(), "!size");
+        assertEquals(expression.value(), "색칠되고 italic's 글씨체");
+        assertEquals(expression.expressionString(), "{!size(10):색칠되고 italic's 글씨체}");
+        assertEquals(expression.arguments(), "10");
+        expression = expression.innerExpression();
+        assertThat(expression, is(instanceOf(LiteralExpression.class)));
+        assertEquals(expression.value(), "색칠되고 italic's 글씨체");
 
-        assertEquals(elements.get(1).raw(), "{{!:`작은따옴표`}}");
-        assertEquals(elements.get(1).expression(), "!");
-        assertEquals(elements.get(1).value(), "`작은따옴표`");
+        exp = "{!size(10):{!:`색칠되고 italic's 글씨체`}}";
+        expression = parser.parse(exp);
+        assertEquals(expression.expression(), "!size");
+        assertEquals(expression.expressionString(), "{!size(10):{!:`색칠되고 italic's 글씨체`}}");
+        assertEquals(expression.arguments(), "10");
+        expression = expression.innerExpression();
+        assertEquals(expression.expression(), "!");
+        assertEquals(expression.value(), "`색칠되고 italic's 글씨체`");
+        assertEquals(expression.expressionString(), "{!:`색칠되고 italic's 글씨체`}");
+        assertNull(expression.arguments());
+        expression = expression.innerExpression();
+        assertThat(expression, is(instanceOf(LiteralExpression.class)));
+        assertEquals(expression.value(), "`색칠되고 italic's 글씨체`");
 
-        raw = "|| __밑줄__ → {{!:_밑줄_}} [* _ (언더바)를 두 번씩 입력한 상태입니다.] this is italic {{text-i:italic string}} ||\n";
-        elements = echoExpressionParser.parse(raw);
-        assertEquals(elements.get(0).raw(), "{{!:_밑줄_}}");
-        assertEquals(elements.get(0).expression(), "!");
-        assertEquals(elements.get(0).value(), "_밑줄_");
+        exp = "{@(조선):{!:'1800년대 우리나라의 왕국'}}";
+        expression = parser.parse(exp);
+        assertEquals(expression.expression(), "@");
+        assertEquals(expression.value(), "{!:'1800년대 우리나라의 왕국'}");
+        assertEquals(expression.expressionString(),
+                "{@(조선):{!:'1800년대 우리나라의 왕국'}}");
+        assertEquals(expression.arguments(), "조선");
+        expression = expression.innerExpression();
+        assertEquals(expression.expression(), "!");
+        assertEquals(expression.value(), "'1800년대 우리나라의 왕국'");
+        assertEquals(expression.expressionString(), "{!:'1800년대 우리나라의 왕국'}");
+        assertNull(expression.arguments());
+        expression = expression.innerExpression();
+        assertThat(expression, is(instanceOf(LiteralExpression.class)));
+        assertEquals(expression.value(), "'1800년대 우리나라의 왕국'");
 
-        assertEquals(elements.get(1).raw(), "{{text-i:italic string}}");
-        assertEquals(elements.get(1).expression(), "text-i");
-        assertEquals(elements.get(1).value(), "italic string");
-    }
-
-
-    @Test
-    public void unitTestParseNestedTextExpression() {
-        String raw = "{{문단({{text-color(orange):{{text-size(10):제목}}}}):조선왕조}}  테마와 관계없이 언제나 동일한 색상이 적용됩니다.\n";
-        List<ParsedElement> elements = echoExpressionParser.parse(raw);
-        ParsedElement root = elements.get(0);
-        assertEquals(root.raw(), "{{문단({{text-color(orange):{{text-size(10):제목}}}}):조선왕조}}");
-        assertEquals(root.expression(), "문단()");
-        assertEquals(root.arguments(), "{{text-color(orange):{{text-size(10):제목}}}}");
-        assertEquals(root.value(), "{{text-size(10):제목}}}}):조선왕조}}");
-
-        ParsedElement child = root.children().get(0);
-        assertEquals(child.raw(), "{{text-color(orange):{{text-size(10):제목}}}}");
-        assertEquals(child.expression(), "text-color(orange)");
-        assertEquals(child.arguments(), "orange");
-        assertEquals(child.value(), "{{text-size(10):제목}}}}");
-
-        child = child.children().get(0);
-        assertEquals(child.raw(), "{{text-size(10):제목}}");
-        assertEquals(child.expression(), "text-size(10)");
-        assertEquals(child.arguments(), "10");
-        assertEquals(child.value(), "제목");
+        exp = "{@(조선, 1-3):{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}}";
+        expression = parser.parse(exp);
+        assertEquals(expression.expression(), "@");
+        assertEquals(expression.value(), "{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}");
+        assertEquals(expression.expressionString(),
+                "{@(조선, 1-3):{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}}");
+        assertEquals(expression.arguments(), "조선, 1-3");
+        expression = expression.innerExpression();
+        assertEquals(expression.expression(), "!");
+        assertEquals(expression.value(), "'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'");
+        assertEquals(expression.expressionString(), "{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}");
+        assertNull(expression.arguments());
+        expression = expression.innerExpression();
+        assertEquals(expression.expression(), "!bgcolor");
+        assertEquals(expression.value(), "1800년대 우리나라의 왕국 경제상황");
+        assertEquals(expression.expressionString(), "{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}");
+        assertEquals(expression.arguments(), "orange");
+        expression = expression.innerExpression();
+        assertThat(expression, is(instanceOf(LiteralExpression.class)));
+        assertEquals(expression.value(), "1800년대 우리나라의 왕국 경제상황");
     }
 }

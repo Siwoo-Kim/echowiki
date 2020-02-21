@@ -1,15 +1,21 @@
 package org.echowiki.core.expression;
 
-import javafx.beans.Observable;
+import com.sun.istack.Nullable;
 
-import java.util.List;
+public interface Expression {
 
-public interface Expression extends Observable {
+    @Nullable
+    String expression();
 
-    List<Expression> children();
+    @Nullable
+    String arguments();
 
-    String open();
+    String expressionString();
 
-    String close();
+    @Nullable
+    Expression innerExpression();
+
+    @Nullable
+    String value();
 
 }
