@@ -101,6 +101,31 @@ public class UnitTestEchoExpressionParser {
 
         exp = "{@(조선, 1-3):{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}}";
         expression = parser.parse(exp);
+        expression.evaluate();
+        assertEquals(expression.expression(), "@");
+        assertEquals(expression.value(), "{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}");
+        assertEquals(expression.expressionString(),
+                "{@(조선, 1-3):{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}}");
+        assertEquals(expression.arguments(), "조선, 1-3");
+        expression = expression.innerExpression();
+        assertEquals(expression.expression(), "!");
+        assertEquals(expression.value(), "'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'");
+        assertEquals(expression.expressionString(), "{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}");
+        assertNull(expression.arguments());
+        expression = expression.innerExpression();
+        assertEquals(expression.expression(), "!bgcolor");
+        assertEquals(expression.value(), "1800년대 우리나라의 왕국 경제상황");
+        assertEquals(expression.expressionString(), "{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}");
+        assertEquals(expression.arguments(), "orange");
+        expression = expression.innerExpression();
+        assertThat(expression, is(instanceOf(LiteralExpression.class)));
+        assertEquals(expression.value(), "1800년대 우리나라의 왕국 경제상황");
+    }
+
+    @Test
+    public void testEventListener() {
+        String exp = "{@(조선, 1-3):{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}}";
+        Expression expression = echoExpressionParser.parse(exp);
         assertEquals(expression.expression(), "@");
         assertEquals(expression.value(), "{!:'{!bgcolor(orange):1800년대 우리나라의 왕국 경제상황}'}");
         assertEquals(expression.expressionString(),

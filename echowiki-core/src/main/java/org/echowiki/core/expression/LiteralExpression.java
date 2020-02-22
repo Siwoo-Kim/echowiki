@@ -1,35 +1,30 @@
 package org.echowiki.core.expression;
 
-public class LiteralExpression implements Expression {
+import org.echowiki.core.expression.meta.AttributeType;
+import org.echowiki.core.expression.meta.ElementType;
 
-    String value;
+public class LiteralExpression extends AbstractExpression {
 
-    public LiteralExpression(String value) {
-        this.value = value;
-    }
+    private static final ElementType TYPE = ElementType.COMMON;
+    private static final String ATTRIBUTE_KEY = "literal";
 
-    @Override
-    public String expression() {
-        return null;
-    }
-
-    @Override
-    public String arguments() {
-        return null;
-    }
-
-    @Override
-    public String expressionString() {
-        return value;
-    }
-
-    @Override
-    public Expression innerExpression() {
-        return null;
+    LiteralExpression(String expString, String expression, String rawValue, String arguments) {
+        super(expString, expression, rawValue, arguments);
     }
 
     @Override
     public String value() {
-        return value;
+        return super.expressionString();
     }
+
+    @Override
+    protected void hookElement(Element el) {
+        el.addAttribute(SimpleElement.newAttribute(AttributeType.LITERAL, ATTRIBUTE_KEY, value()));
+    }
+
+    @Override
+    protected ElementType getElementType() {
+        return TYPE;
+    }
+
 }
