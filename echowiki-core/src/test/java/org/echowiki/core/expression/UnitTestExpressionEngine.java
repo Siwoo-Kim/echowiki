@@ -6,6 +6,23 @@ public class UnitTestExpressionEngine {
 
     ExpressionEngine engine = new ExpressionEngine();
 
+    String WIKI_EXPRESSION =
+            "== {p:{!:'개요'} ==\n" +
+            "\n" +
+            "{!:'시작'} 해볼까요? \n" +
+            "{!color(skyblue):에코 표현식}을 사용해볼게요. {+(여기를 클릭):이렇게 주석도 가능합니다}\n" +
+            "표현식은 \\{\\} 을 사용하여 정의합니다. {!bgcolor(red):{!:'조심'}} 하세요.\n" +
+            " ( '\\{\\}' 은 {!:`에코 엔진`}에게 특별한 의미가 있답니다.)";
+    
+    String PARSED_EXPRESSION =
+            "[@paragraph]\n" +
+            "== [@echo0] ==\n" +
+            "\n" +
+            "[@echo1] 해볼까요? \n" +
+            "[@echo2]\n" +
+            "표현식은 \\{\\} 을 사용하여 정의합니다. [@echo3] 하세요.\n" +
+            " ( '\\{\\}' 은 [@echo4]에게 특별한 의미가 있답니다.)";
+
     @Test
     public void unitTestExpressionEngineEncoding() {
         String TEXT =    "=== {p:텍스트 배경 그라데이션 효과} ===\n" +

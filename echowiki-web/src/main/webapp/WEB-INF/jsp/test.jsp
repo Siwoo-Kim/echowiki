@@ -38,16 +38,21 @@
         <div class="col-6">
             <pre>
                 <c:if test="${paragraph != null}">
-                    <c:forEach items="${paragraph.elements}" var="e">
-                        ${e}
-                    </c:forEach>
                     <hr>
                     ${paragraph.encodedString()}
                     <hr>
                     ${paragraph.decodedString()}
                 </c:if>
-
             </pre>
+        </div>
+        <div class="col-12">
+            <div class="list-group">
+                <c:forEach items="${paragraph.elements}" var="e">
+                    <a class="list-group-item">
+                        ${e}
+                    </a>
+                </c:forEach>
+            </div>
         </div>
     </div>
 </div>
