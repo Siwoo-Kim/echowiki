@@ -9,19 +9,22 @@ public abstract class EchoTextExpression extends AbstractEchoExpression {
 
     private static final AttributeType ATTRIBUTE_TYPE = AttributeType.TEXT;
 
+    EchoTextExpression(String expString, String expression, String rawValue, String arguments) {
+        super(expString, expression, rawValue, arguments);
+    }
+
     public static EchoTextExpression newInstance(String expString, String expression, String rawValue, String arguments) {
         checkArgument(Strings.isNotBlank(expression));
         switch (expression) {
-            case "!": return new TextStyleDecorator(expString, expression, rawValue, arguments);
-            case "!size": return new TextSizeDecorator(expString, expression, rawValue, arguments);
+            case "!":
+                return new TextStyleDecorator(expString, expression, rawValue, arguments);
+            case "!size":
+                return new TextSizeDecorator(expString, expression, rawValue, arguments);
             case "!color":
-            case "!bgcolor": return new TextColorDecorator(expString, expression, rawValue, arguments);
+            case "!bgcolor":
+                return new TextColorDecorator(expString, expression, rawValue, arguments);
         }
         throw new MalformedExpressionException(String.format("Unknown Expresion [%s]", expString));
-    }
-
-    EchoTextExpression(String expString, String expression, String rawValue, String arguments) {
-        super(expString, expression, rawValue, arguments);
     }
 
     @Override
@@ -48,7 +51,6 @@ public abstract class EchoTextExpression extends AbstractEchoExpression {
     private static class TextStyleDecorator extends EchoTextExpression {
         private static final char[] EXPRESSIONS_WRAPPER = {'\'', '`', '-', '_'};
         private static final String[] DEFINED_EXPRESSIONS = {"!"};
-
         private static final String ATTRIBUTE_KEY = "text-style";
         private static final String[] ATTRIBUTE_VALUES = {"bold", "italic", "del", "underline"};
 
@@ -59,7 +61,7 @@ public abstract class EchoTextExpression extends AbstractEchoExpression {
         Element.Attribute attribute() {
             String value = value();
             char firstChar = value.charAt(0);
-            for (int i=0; i<EXPRESSIONS_WRAPPER.length; i++)
+            for (int i = 0; i < EXPRESSIONS_WRAPPER.length; i++)
                 if (firstChar == EXPRESSIONS_WRAPPER[i])
                     return SimpleElement.newAttribute(ATTRIBUTE_TYPE, ATTRIBUTE_KEY, ATTRIBUTE_VALUES[i]);
             assert false;
@@ -76,7 +78,7 @@ public abstract class EchoTextExpression extends AbstractEchoExpression {
         }
 
         Element.Attribute attribute() {
-            for (int i = 0; i< DEFINED_EXPRESSIONS.length; i++)
+            for (int i = 0; i < DEFINED_EXPRESSIONS.length; i++)
                 if (expression().equals(DEFINED_EXPRESSIONS[i]))
                     return SimpleElement.newAttribute(ATTRIBUTE_TYPE, ATTRIBUTE_KEYS[i], arguments());
             assert false;

@@ -1,5 +1,6 @@
 package org.echowiki.core.expression;
 
+import org.echowiki.core.expression.meta.AttributeType;
 
 public class EchoLinkDocumentExpression extends AbstractEchoExpression {
 
@@ -11,6 +12,6 @@ public class EchoLinkDocumentExpression extends AbstractEchoExpression {
 
     @Override
     protected void hookElement(Element el) {
-
+        el.addAttribute(SimpleElement.newAttribute(AttributeType.LINK, "wiki-link", arguments()));
     }
 }

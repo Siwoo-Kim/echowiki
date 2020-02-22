@@ -36,6 +36,11 @@ public abstract class AbstractExpression implements Expression, PropertyChangeLi
         this.arguments = arguments;
     }
 
+    /**
+     * add given {@link Expression} as internal expression.
+     *
+     * @param expression
+     */
     void addExpression(Expression expression) {
         if (expression instanceof AbstractExpression) {
             AbstractExpression instance = (AbstractExpression) expression;

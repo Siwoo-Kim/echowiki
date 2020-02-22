@@ -7,11 +7,6 @@ import java.util.Map;
 
 public final class EchoExpressionFactory {
 
-    @FunctionalInterface
-    private interface EchoExpressionProvider {
-        AbstractEchoExpression provide(String expString,String expression,String value,String arguments);
-    }
-
     private static final Map<String, EchoExpressionProvider> PROVIDER_TABLE;
 
     static {
@@ -21,8 +16,8 @@ public final class EchoExpressionFactory {
         PROVIDER_TABLE.put("!color", EchoTextExpression::newInstance);
         PROVIDER_TABLE.put("!bgcolor", EchoTextExpression::newInstance);
         PROVIDER_TABLE.put("@", EchoLinkDocumentExpression::new);
-        PROVIDER_TABLE.put("li", EchoListExpression::new);
-        PROVIDER_TABLE.put("nli", EchoListExpression::new);
+        PROVIDER_TABLE.put("li", EchoListExpression::newInstance);
+        PROVIDER_TABLE.put("nli", EchoListExpression::newInstance);
         PROVIDER_TABLE.put("+", EchoNoteExpression::new);
     }
 
@@ -33,5 +28,10 @@ public final class EchoExpressionFactory {
         Expression instance = null;
         EchoExpressionProvider provider = PROVIDER_TABLE.get(expression);
         return provider.provide(expString, expression, value, arguments);
+    }
+
+    @FunctionalInterface
+    private interface EchoExpressionProvider {
+        AbstractEchoExpression provide(String expString, String expression, String value, String arguments);
     }
 }

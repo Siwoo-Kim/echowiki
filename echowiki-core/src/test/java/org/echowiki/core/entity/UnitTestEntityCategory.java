@@ -1,4 +1,4 @@
-package com.echowiki.core.entity;
+package org.echowiki.core.entity;
 
 import org.echowiki.core.configuration.CoreConfiguration;
 import org.echowiki.core.configuration.DatabaseConfiguration;
