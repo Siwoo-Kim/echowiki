@@ -1,4 +1,4 @@
-package com.echowiki.core.expression.parser;
+package org.echowiki.core.expression;
 
 import org.echowiki.core.expression.*;
 import org.junit.Test;
