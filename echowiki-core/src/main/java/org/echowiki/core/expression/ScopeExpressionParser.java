@@ -31,8 +31,8 @@ public class ScopeExpressionParser extends AbstractExpressionParser implements E
         String echoExpression = getEchoExpressionInString(startLine);
         String wrapper = getWrapperInString(startLine);
         String exp = echoParser.getExpressionInString(echoExpression);
-        String arguments = echoParser.getArgumentsInString(expString);
-        String value = echoParser.getValueInString(expString);
+        String arguments = echoParser.getArgumentsInString(echoExpression);
+        String value = echoParser.getValueInString(echoExpression);
         return ScopeExpressionFactory.newInstance(expString, exp, arguments, value, wrapper);
     }
 

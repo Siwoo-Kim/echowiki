@@ -1,8 +1,10 @@
 package org.echowiki.core.expression;
 
 import lombok.AllArgsConstructor;
-import org.echowiki.core.expression.meta.AttributeType;
-import org.echowiki.core.expression.meta.ElementType;
+import org.echowiki.core.expression.element.Attribute;
+import org.echowiki.core.expression.element.Element;
+import org.echowiki.core.expression.element.AttributeType;
+import org.echowiki.core.expression.element.ElementType;
 import org.junit.Test;
 
 import java.beans.PropertyChangeEvent;
@@ -164,14 +166,14 @@ public class UnitTestAbstractExpression {
         inner.addExpression(innerMost);
         innerMost.addExpression(literal);
         Element element = outerMost.evaluate();
-        List<String> keys = element.getAttributes().stream().map(Element.Attribute::key).collect(Collectors.toList());
-        List<String> values = element.getAttributes().stream().map(Element.Attribute::value).collect(Collectors.toList());
+        List<String> keys = element.attributes().stream().map(Attribute::key).collect(Collectors.toList());
+        List<String> values = element.attributes().stream().map(Attribute::value).collect(Collectors.toList());
         assertThat(keys, hasItems("outerMost", "outer", "inner", "innerMost", "literal"));
         assertThat(values, hasItems("outerMost", "outer", "inner", "innerMost", "'This is test'"));
     }
 
     @AllArgsConstructor
-    private static class TestAttribute implements Element.Attribute {
+    private static class TestAttribute implements Attribute {
         private final String key;
         private final String value;
 

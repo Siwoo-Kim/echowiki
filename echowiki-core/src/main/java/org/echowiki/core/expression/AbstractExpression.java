@@ -1,25 +1,25 @@
 package org.echowiki.core.expression;
 
+import com.google.common.base.MoreObjects;
 import com.sun.istack.Nullable;
 import org.apache.logging.log4j.util.Strings;
-import org.echowiki.core.expression.meta.AttributeType;
-import org.echowiki.core.expression.meta.ElementType;
+import org.echowiki.core.expression.element.Element;
+import org.echowiki.core.expression.element.ElementType;
+import org.echowiki.core.expression.element.SimpleElement;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
-import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
 /**
  * {@inheritDoc}
- *
+ * <p>
  * The class {@link AbstractEchoExpression} provides an ability of observing nested {@link Expression}'s evaluation point for it's subclass.
  * Note that the class only supports observation for nested {@link Expression} which also extends {@link AbstractExpression}.
- *
+ * <p>
  * To get notification from the evaluation event of nested {@link Expression}, override {@link #propertyChange(PropertyChangeEvent)} method.
- *
  */
 public abstract class AbstractExpression implements Expression, PropertyChangeListener {
 
@@ -87,7 +87,7 @@ public abstract class AbstractExpression implements Expression, PropertyChangeLi
         if (innerExpression != null)
             el = innerExpression.evaluate();    //from nested
         else
-            el = SimpleElement.newElement(getElementType());
+            el = new SimpleElement(getElementType());
         hookElement(el);
         support.firePropertyChange(new PropertyChangeEvent(this, expression, null, this));
         return el;
@@ -105,21 +105,29 @@ public abstract class AbstractExpression implements Expression, PropertyChangeLi
     }
 
     /**
-     * @implSpec subclass should setup it's attributes in given {@link Element}.
-     *
      * @param el
+     * @implSpec subclass should setup it's attributes in given {@link Element}.
      */
     abstract void hookElement(Element el);
 
     /**
-     * @implSpec  subclass should define it's {@link ElementType}.
-     *
      * @return
+     * @implSpec subclass should define it's {@link ElementType}.
      */
     abstract ElementType getElementType();
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
 
+    }
+
+    @Override
+    public String toString() {
+        return MoreObjects.toStringHelper(this.getClass())
+                .omitNullValues()
+                .add("exp", expression)
+                .add("args", arguments)
+                .add("value", value)
+                .toString();
     }
 }

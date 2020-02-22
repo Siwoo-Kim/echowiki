@@ -1,5 +1,7 @@
 package org.echowiki.core.expression;
 
+import org.echowiki.core.expression.element.Element;
+
 public class RegularScopeExpression implements ScopeExpression {
     public RegularScopeExpression(String expString) {
     }

@@ -1,8 +1,7 @@
 package org.echowiki.core.expression;
 
 
-import org.echowiki.core.expression.meta.AttributeType;
-import org.echowiki.core.expression.meta.ElementType;
+import org.echowiki.core.expression.element.ElementType;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
@@ -18,14 +17,18 @@ public abstract class AbstractScopeExpression extends AbstractExpression impleme
     private final List<Expression> expressions = new ArrayList<>();
     private final int depth;
     private final boolean closed;
-    private int indexOfList = 0;
 
     AbstractScopeExpression(String expString, String expression, String rawValue, String arguments, String wrapper) {
         super(expString, expression, rawValue, arguments);
-        checkArgument(wrapper.startsWith(OPENING_BRACKET) && wrapper.endsWith(CLOSING_BRACKET));
-        String[] lines = expString.split("\n");
-        String lastLine = lines[lines.length-1];
-        closed = lastLine.startsWith(OPENING_BRACKET) && lastLine.endsWith(CLOSING_BRACKET);
+        checkArgument(wrapper.startsWith(OPENING_BRACKET)
+                && wrapper.endsWith(CLOSING_BRACKET));
+
+        String lastLine = StringHelper.lastLineOf(expString);
+        if (lastLine != null)
+            closed = lastLine.startsWith(OPENING_BRACKET)
+                    && lastLine.endsWith(CLOSING_BRACKET);
+        else
+            closed = false;
         int depth = wrapper.split(" ")[0].length();
         this.depth = depth - 2;
     }

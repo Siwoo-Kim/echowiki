@@ -1,6 +1,5 @@
 package org.echowiki.core.expression;
 
-import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Stack;
@@ -60,7 +59,7 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
             if ((expression instanceof AbstractExpression)
                     && expression.innerExpression() == null
                     && expression.value() != null) {
-                ((AbstractExpression) expression).addExpression(
+                expression.addExpression(
                         EchoExpressionFactory.newInstance(expression.value(), null, null, null));
                 break;
             }
@@ -156,7 +155,7 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
     public boolean hasEchoExpressionInLine(String line) {
         if (Strings.isBlank(line)) return false;
         if (line.contains("\n")) throw new IllegalArgumentException(
-               String.format("Remove the \n in the line [%s]", line));
+                String.format("Remove the \n in the line [%s]", line));
         return LINE_PATTERN.matcher(line).find() || LINE_PATTERN.matcher(line).matches();
     }
 

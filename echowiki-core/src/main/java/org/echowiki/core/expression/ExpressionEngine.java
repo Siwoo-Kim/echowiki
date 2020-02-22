@@ -1,7 +1,5 @@
 package org.echowiki.core.expression;
 
-import com.sun.org.apache.bcel.internal.generic.ARETURN;
-import com.sun.org.apache.bcel.internal.generic.DRETURN;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,11 +8,10 @@ import java.util.regex.Pattern;
 
 public class ExpressionEngine {
 
-    public static final String NEW_LINE = "\n";
     private static final EchoExpressionParser echoParser = new EchoExpressionParser();
     private static final ScopeExpressionParser scopeParser = new ScopeExpressionParser();
 
-    ParagraphContext encoding(String rawText) {
+    public ParagraphContext encoding(String rawText) {
         Map<String, Expression> mapper = new HashMap<>();
         String[] lines = rawText.split("\n");
         String[] encodedLines = new String[lines.length];
@@ -34,7 +31,7 @@ public class ExpressionEngine {
                     .matcher(lines[end])
                     .replaceFirst(Matcher.quoteReplacement("[/@paragraph]"));
         }
-        for (; start<end; start++) {
+        for (; start < end; start++) {
             String line = lines[start];
             encodedLines[start] = line;
             while (echoParser.hasEchoExpressionInLine(line)) {
@@ -48,7 +45,7 @@ public class ExpressionEngine {
                 encodedLines[start] = line;
             }
         }
-        return new SimpleParagraphContext(lines, encodedLines,  scopeExpression, mapper);
+        return new SimpleParagraphContext(lines, encodedLines, scopeExpression, mapper);
     }
 
 

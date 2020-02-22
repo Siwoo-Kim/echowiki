@@ -1,15 +1,23 @@
 package org.echowiki.core.expression;
 
+import org.echowiki.core.expression.element.Element;
+
 import java.util.List;
 
-public interface ParagraphContext {
+public interface ParagraphContext extends Iterable<Element> {
 
-    ScopeExpression getScopeExpression();
+    Expression getContext();
 
-    List<Element> getEchoExpressions();
+    List<Element> getElements();
 
     String encodedString();
 
+    String decodedString();
+
+    String[] encodedLines();
+
     Element indexAt(int index);
+
+    Element indexAt(String index);
 
 }

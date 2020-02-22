@@ -1,6 +1,6 @@
 package org.echowiki.core.expression;
 
-import org.echowiki.core.expression.meta.ElementType;
+import org.echowiki.core.expression.element.ElementType;
 
 public abstract class AbstractEchoExpression extends AbstractExpression {
 

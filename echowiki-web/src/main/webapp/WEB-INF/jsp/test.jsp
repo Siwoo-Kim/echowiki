@@ -6,41 +6,50 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <c:set var="category" value="${categories.get(0)}" scope="request"/>
 
-<%
-    EntityCategory cat = (EntityCategory) request.getAttribute("category");
-    List<Category> desc = cat.getDescendants(Tree.Traversal.LEVEL);
-    request.setAttribute("desc", desc);
-%>
-
 <html>
-<head>
-    <title>TEST</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
-          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"
-            integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6"
-            crossorigin="anonymous"></script>
-</head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+<style>
+    div {
+        margin-top: 50px;
+        font-family: -apple-system,BlinkMacSystemFont,Segoe WPC,Segoe UI,HelveticaNeue-Light,Ubuntu,Droid Sans,sans-serif;
+        font-size: .9rem;
+        line-height: 1.5;
+        word-break: break-all;
+        font-feature-settings: "liga" off,"calt" off;
+    }
+
+    textarea {
+        height: 400px;
+        width: 100%;
+    }
+</style>
 <body>
 <div class="container">
-    <h1>분류: ${category.title}</h1>
-    <p>최근 수정 시각: ${category.eventTime.creation}</p>
-</div>
+    <div class="row">
+        <div class="col-6">
+            <form action="/test" method="post">
+                <textarea name="text" wrap="soft">
 
-<div class="container">
-    상위 분류:
-    <ul>
-        <c:forEach items="${category.children}" var="child">
-            <li>${child.title}</li>
-        </c:forEach>
-    </ul>
-</div>
+                </textarea>
+                <button class="btn btn-primary" type="submit">Parsing</button>
+            </form>
+        </div>
+        <div class="col-6">
+            <pre>
+                <c:if test="${paragraph != null}">
+                    <c:forEach items="${paragraph.elements}" var="e">
+                        ${e}
+                    </c:forEach>
+                    <hr>
+                    ${paragraph.encodedString()}
+                    <hr>
+                    ${paragraph.decodedString()}
+                </c:if>
 
-<div class="container">
-    <h1>하위 분류:</h1>
-    <c:forEach items="${desc}" var="descendant">
-        <li>${descendant.title}</li>
-    </c:forEach>
+            </pre>
+        </div>
+    </div>
 </div>
 
 </body>
