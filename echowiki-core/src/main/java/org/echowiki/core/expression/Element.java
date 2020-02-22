@@ -21,7 +21,6 @@ public interface Element {
     List<Attribute> attributeOf(AttributeType type);
 
     interface Attribute {
-
         AttributeType type();
 
         String key();

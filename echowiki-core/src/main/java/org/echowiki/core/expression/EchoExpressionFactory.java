@@ -21,12 +21,16 @@ public final class EchoExpressionFactory {
         PROVIDER_TABLE.put("+", EchoNoteExpression::new);
     }
 
+    private EchoExpressionFactory() {}
+
     public static Expression newInstance(String expString, String expression, @Nullable String value, @Nullable String arguments) {
         if (expression == null)
             return new LiteralExpression(expString, null, null, null);
         expression = expression.trim();
         Expression instance = null;
         EchoExpressionProvider provider = PROVIDER_TABLE.get(expression);
+        if (provider == null)
+            throw new MalformedExpressionException(String.format("Unknown expression [%s] in string [%s]", expression, expString));
         return provider.provide(expString, expression, value, arguments);
     }
 

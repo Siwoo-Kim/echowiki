@@ -35,6 +35,8 @@ public interface Expression {
      */
     String expressionString();
 
+    void addExpression(Expression innerExpression);
+
     /**
      * returns the inner {@link Expression} of the expression.
      * eg) {!color(orange):{!:'This is bold text'}} => inner {@link Expression} of "{!:'This is bold text'}"

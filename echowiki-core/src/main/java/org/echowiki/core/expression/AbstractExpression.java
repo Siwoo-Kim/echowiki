@@ -2,11 +2,13 @@ package org.echowiki.core.expression;
 
 import com.sun.istack.Nullable;
 import org.apache.logging.log4j.util.Strings;
+import org.echowiki.core.expression.meta.AttributeType;
 import org.echowiki.core.expression.meta.ElementType;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
+import java.util.List;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
@@ -41,7 +43,7 @@ public abstract class AbstractExpression implements Expression, PropertyChangeLi
      *
      * @param expression
      */
-    void addExpression(Expression expression) {
+    public void addExpression(Expression expression) {
         if (expression instanceof AbstractExpression) {
             AbstractExpression instance = (AbstractExpression) expression;
             instance.support.addPropertyChangeListener(this);

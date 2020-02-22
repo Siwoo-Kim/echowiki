@@ -5,6 +5,7 @@ import org.echowiki.core.expression.meta.AttributeType;
 //@todo better way to specifying line elements.
 public abstract class EchoListExpression extends AbstractEchoExpression {
     private static final AttributeType type = AttributeType.LIST;
+    public static final String LINE_ATTRIBUTE_KEY = "echo-line";
 
     EchoListExpression(String expString, String expression, String rawValue, String arguments) {
         super(expString, expression, rawValue, arguments);

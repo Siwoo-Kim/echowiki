@@ -1,14 +1,15 @@
 package org.echowiki.core.expression;
 
+import com.sun.org.apache.xerces.internal.impl.xpath.regex.Match;
 import org.apache.logging.log4j.util.Strings;
 
 import java.util.Stack;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkElementIndex;
 
-public class EchoExpressionParser implements ExpressionParser {
+public class EchoExpressionParser extends AbstractExpressionParser implements ExpressionParser {
 
     public static final char ESCAPE = '\\';
     public static final char OPEN_BRACKET = '{';
@@ -18,11 +19,13 @@ public class EchoExpressionParser implements ExpressionParser {
     public static final char VALUE_SEPARATOR = ':';
 
     //{exp[(args, args..)]?:[value|exp]}
-    private static final Pattern pattern = Pattern.compile("^\\{.+}$");
+    private static final Pattern ECHO_PATTERN = Pattern.compile("^\\{.+}$");
+    //negative lookbehind
+    private static final Pattern LINE_PATTERN = Pattern.compile("(?<!\\\\)\\{.*[^\\\\]}");
 
-    static boolean isExpression(String expString) {
+    static boolean isEchoExpression(String expString) {
         if (expString == null) return false;
-        return pattern.matcher(expString).matches();
+        return ECHO_PATTERN.matcher(expString).matches();
     }
 
     @Override
@@ -77,7 +80,7 @@ public class EchoExpressionParser implements ExpressionParser {
 
     //{exp(args, args...):value} => args, args...
     //{exp(args, args...):{exp(args): value}} => args, args...
-    private String getArgumentsInString(String expString) {
+    String getArgumentsInString(String expString) {
         if (isWrapped(expString, OPEN_BRACKET, CLOSE_BRACKET))
             expString = stripOffWrapper(expString, OPEN_BRACKET, CLOSE_BRACKET);
         int depth = 0, start = 0, end = expString.length();
@@ -100,8 +103,17 @@ public class EchoExpressionParser implements ExpressionParser {
         return null;
     }
 
-    //exp(args, args...):[value|{exp}]
-    private String getExpressionInString(String expString) {
+    /**
+     * returns expression from the expString.
+     * eg -> exp(args, args...):[value|{exp}] => exp
+     * eg -> exp:[value|{exp}] => exp
+     * eg -> exp => exp
+     *
+     * @param expString
+     * @return
+     */
+    String getExpressionInString(String expString) {
+        expString = expString.trim();
         if (isWrapped(expString, OPEN_BRACKET, CLOSE_BRACKET))
             expString = stripOffWrapper(expString, OPEN_BRACKET, CLOSE_BRACKET);
         int start = 0, end = expString.length();
@@ -114,7 +126,7 @@ public class EchoExpressionParser implements ExpressionParser {
         return expString;
     }
 
-    private String getValueInString(String expression) {
+    String getValueInString(String expression) {
         int index = getIndexOfValueSeparator(expression);
         if (index == -1)
             return null;
@@ -141,23 +153,17 @@ public class EchoExpressionParser implements ExpressionParser {
         return -1;
     }
 
-    private boolean isCharEscaped(String expString, int start) {
-        checkElementIndex(start, expString.length());
-        if (start == 0) return false;
-        return expString.charAt(start - 1) == ESCAPE;
+    public boolean hasEchoExpressionInLine(String line) {
+        if (Strings.isBlank(line)) return false;
+        if (line.contains("\n")) throw new IllegalArgumentException(
+               String.format("Remove the \n in the line [%s]", line));
+        return LINE_PATTERN.matcher(line).find() || LINE_PATTERN.matcher(line).matches();
     }
 
-    private boolean isWrapped(String expString, char openBracket, char closeBracket) {
-        expString = expString.trim();
-        return expString.charAt(0) == openBracket
-                && expString.charAt(expString.length() - 1) == closeBracket;
+    public String getEchoExpressionInLine(String line) {
+        Matcher matcher = LINE_PATTERN.matcher(line);
+        if (!matcher.find())
+            throw new IllegalArgumentException(String.format("Cannot find Echo Expression from %s", line));
+        return line.substring(matcher.start(), matcher.end());
     }
-
-    private String stripOffWrapper(String expString, char openBracket, char closeBracket) {
-        expString = expString.trim();
-        checkArgument(expString.charAt(0) == openBracket);
-        checkArgument(expString.charAt(expString.length() - 1) == closeBracket);
-        return expString.substring(1, expString.length() - 1);
-    }
-
 }
