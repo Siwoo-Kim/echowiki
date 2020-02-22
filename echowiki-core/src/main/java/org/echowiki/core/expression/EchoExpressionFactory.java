@@ -2,46 +2,36 @@ package org.echowiki.core.expression;
 
 import com.sun.istack.Nullable;
 
-public class EchoExpressionFactory {
+import java.util.HashMap;
+import java.util.Map;
 
-    private static final String TEXT_EXPRESSION = "!";
-    private static final String TEXT_SIZE_EXPRESSION = "!size";
-    private static final String TEXT_COLOR_EXPRESSION = "!color";
-    private static final String TEXT_BG_COLOR_EXPRESSION = "!bgcolor";
-    private static final String LINK_DOCUMENT_EXPRESSION = "@";
-    private static final String LIST_SIMPLE_EXPRESSION = "li";
-    private static final String LIST_NUMBER_EXPRESSION = "nli";
-    private static final String NOTE_EXPRESSION = "+";
+public final class EchoExpressionFactory {
+
+    @FunctionalInterface
+    private interface EchoExpressionProvider {
+        AbstractEchoExpression provide(String expString,String expression,String value,String arguments);
+    }
+
+    private static final Map<String, EchoExpressionProvider> PROVIDER_TABLE;
+
+    static {
+        PROVIDER_TABLE = new HashMap<>();
+        PROVIDER_TABLE.put("!", EchoTextExpression::newInstance);
+        PROVIDER_TABLE.put("!size", EchoTextExpression::newInstance);
+        PROVIDER_TABLE.put("!color", EchoTextExpression::newInstance);
+        PROVIDER_TABLE.put("!bgcolor", EchoTextExpression::newInstance);
+        PROVIDER_TABLE.put("@", EchoLinkDocumentExpression::new);
+        PROVIDER_TABLE.put("li", EchoListExpression::new);
+        PROVIDER_TABLE.put("nli", EchoListExpression::new);
+        PROVIDER_TABLE.put("+", EchoNoteExpression::new);
+    }
 
     public static Expression newInstance(String expString, String expression, @Nullable String value, @Nullable String arguments) {
+        if (expression == null)
+            return new LiteralExpression(expString, null, null, null);
         expression = expression.trim();
         Expression instance = null;
-        switch (expression) {
-            case TEXT_EXPRESSION:
-                instance = new EchoTextExpression(expString, expression, value, arguments);
-                break;
-            case TEXT_SIZE_EXPRESSION:
-                instance = new EchoTextExpression(expString, expression, value, arguments);
-                break;
-            case TEXT_COLOR_EXPRESSION:
-                instance = new EchoTextExpression(expString, expression, value, arguments);
-                break;
-            case TEXT_BG_COLOR_EXPRESSION:
-                instance = new EchoTextExpression(expString, expression, value, arguments);
-                break;
-            case LINK_DOCUMENT_EXPRESSION:
-                instance = new EchoLinkDocumentExpression(expString, expression, value, arguments);
-                break;
-            case LIST_SIMPLE_EXPRESSION:
-                instance = new EchoListExpression(expString, expression, value, arguments);
-                break;
-            case LIST_NUMBER_EXPRESSION:
-                instance = new EchoListExpression(expString, expression, value, arguments);
-                break;
-            case NOTE_EXPRESSION:
-                instance = new EchoNoteExpression(expString, expression, value, arguments);
-                break;
-        }
-        return instance;
+        EchoExpressionProvider provider = PROVIDER_TABLE.get(expression);
+        return provider.provide(expString, expression, value, arguments);
     }
 }

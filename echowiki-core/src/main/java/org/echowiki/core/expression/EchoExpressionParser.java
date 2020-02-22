@@ -20,10 +20,17 @@ public class EchoExpressionParser implements ExpressionParser {
     //{exp[(args, args..)]?:[value|exp]}
     private static final Pattern pattern = Pattern.compile("^\\{.+}$");
 
+    static boolean isExpression(String expString) {
+        if (expString == null) return false;
+        return pattern.matcher(expString).matches();
+    }
+
     @Override
     public Expression parse(String expString) {
+        checkArgument(Strings.isNotBlank(expString));
         Stack<String> tokens = new Stack<>();
         Stack<Integer> openBracketIndex = new Stack<>();
+        //find tokens which is wrapped in '{}'
         for (int start = 0; start < expString.length(); start++) {
             char c = expString.charAt(start);
             if (c == OPEN_BRACKET && !isCharEscaped(expString, start)) {
@@ -34,22 +41,24 @@ public class EchoExpressionParser implements ExpressionParser {
             }
         }
         String token = tokens.pop();
-        AbstractEchoExpression rootExpression = (AbstractEchoExpression) internalParse(token);
-        AbstractEchoExpression currentExpression = rootExpression;
+        AbstractExpression rootExpression = (AbstractExpression) internalParse(token);
+        AbstractExpression currentExpression = rootExpression;
+        //adding expression from outer to nested
         while (!tokens.isEmpty()) {
             token = tokens.pop();
             Expression childExpression = internalParse(token);
-            if (childExpression instanceof LiteralExpression)
-                break;
-            currentExpression.innerExpression = childExpression;
-            currentExpression = (AbstractEchoExpression) childExpression;
+            currentExpression.addExpression(childExpression);
+            currentExpression = (AbstractExpression) childExpression;
         }
+        //check the innermost expression has value
+        //if it is creating literal expression
         Expression expression = rootExpression;
         while (expression != null) {
-            if ((expression instanceof AbstractEchoExpression)
-                && expression.innerExpression() == null
+            if ((expression instanceof AbstractExpression)
+                    && expression.innerExpression() == null
                     && expression.value() != null) {
-                ((AbstractEchoExpression) expression).innerExpression = new LiteralExpression(expression.value());
+                ((AbstractExpression) expression).addExpression(
+                        EchoExpressionFactory.newInstance(expression.value(), null, null, null));
                 break;
             }
             expression = expression.innerExpression();
@@ -64,11 +73,6 @@ public class EchoExpressionParser implements ExpressionParser {
         String exp = getExpressionInString(copiedExpString);
         String arguments = getArgumentsInString(copiedExpString);
         return EchoExpressionFactory.newInstance(expString, exp, value, arguments);
-    }
-
-    static boolean isExpression(String expString) {
-        if (expString == null) return false;
-        return pattern.matcher(expString).matches();
     }
 
     //{exp(args, args...):value} => args, args...

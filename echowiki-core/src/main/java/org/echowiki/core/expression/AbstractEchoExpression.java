@@ -1,43 +1,15 @@
 package org.echowiki.core.expression;
 
-public class AbstractEchoExpression implements Expression {
+import org.echowiki.core.expression.meta.ElementType;
 
-    String expString;
-    String expression;
-    Expression innerExpression;
-    String arguments;
-    String rawValue;
+public abstract class AbstractEchoExpression extends AbstractExpression {
 
-    AbstractEchoExpression(String expString, String expression, String rawValue, String arguments) {
-        this.expString = expString;
-        this.expression = expression;
-        this.rawValue = rawValue;
-        this.arguments = arguments;
+    public AbstractEchoExpression(String expString, String expression, String rawValue, String arguments) {
+        super(expString, expression, rawValue, arguments);
     }
 
     @Override
-    public String expression() {
-        return expression;
+    ElementType getElementType() {
+        return ElementType.ECHO;
     }
-
-    @Override
-    public String arguments() {
-        return arguments;
-    }
-
-    @Override
-    public String expressionString() {
-        return expString;
-    }
-
-    @Override
-    public Expression innerExpression() {
-        return innerExpression;
-    }
-
-    @Override
-    public String value() {
-        return rawValue;
-    }
-
 }
