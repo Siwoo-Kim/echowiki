@@ -7,11 +7,6 @@ import java.util.Map;
 
 public final class EchoExpressionFactory {
 
-    @FunctionalInterface
-    private interface EchoExpressionProvider {
-        AbstractEchoExpression provide(String expString,String expression,String value,String arguments);
-    }
-
     private static final Map<String, EchoExpressionProvider> PROVIDER_TABLE;
 
     static {
@@ -21,10 +16,12 @@ public final class EchoExpressionFactory {
         PROVIDER_TABLE.put("!color", EchoTextExpression::newInstance);
         PROVIDER_TABLE.put("!bgcolor", EchoTextExpression::newInstance);
         PROVIDER_TABLE.put("@", EchoLinkDocumentExpression::new);
-        PROVIDER_TABLE.put("li", EchoListExpression::new);
-        PROVIDER_TABLE.put("nli", EchoListExpression::new);
+        PROVIDER_TABLE.put("li", EchoListExpression::newInstance);
+        PROVIDER_TABLE.put("nli", EchoListExpression::newInstance);
         PROVIDER_TABLE.put("+", EchoNoteExpression::new);
     }
+
+    private EchoExpressionFactory() {}
 
     public static Expression newInstance(String expString, String expression, @Nullable String value, @Nullable String arguments) {
         if (expression == null)
@@ -32,6 +29,13 @@ public final class EchoExpressionFactory {
         expression = expression.trim();
         Expression instance = null;
         EchoExpressionProvider provider = PROVIDER_TABLE.get(expression);
+        if (provider == null)
+            throw new MalformedExpressionException(String.format("Unknown expression [%s] in string [%s]", expression, expString));
         return provider.provide(expString, expression, value, arguments);
+    }
+
+    @FunctionalInterface
+    private interface EchoExpressionProvider {
+        AbstractEchoExpression provide(String expString, String expression, String value, String arguments);
     }
 }

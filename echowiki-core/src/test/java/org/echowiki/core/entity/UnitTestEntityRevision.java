@@ -1,4 +1,4 @@
-package com.echowiki.core.entity;
+package org.echowiki.core.entity;
 
 import org.echowiki.core.domain.Revision;
 import org.echowiki.core.entity.EntityDocument;

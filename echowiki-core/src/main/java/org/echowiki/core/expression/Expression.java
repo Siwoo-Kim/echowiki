@@ -1,6 +1,7 @@
 package org.echowiki.core.expression;
 
 import com.sun.istack.Nullable;
+import org.echowiki.core.expression.element.Element;
 
 /**
  * The interface represents Expression.
@@ -34,6 +35,8 @@ public interface Expression {
      * @return
      */
     String expressionString();
+
+    void addExpression(Expression innerExpression);
 
     /**
      * returns the inner {@link Expression} of the expression.
