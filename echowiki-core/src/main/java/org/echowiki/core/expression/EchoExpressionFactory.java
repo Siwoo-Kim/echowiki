@@ -1,34 +1,51 @@
 package org.echowiki.core.expression;
 
 import com.sun.istack.Nullable;
+import lombok.AllArgsConstructor;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Predicate;
 
 public final class EchoExpressionFactory {
 
-    private static final Map<String, EchoExpressionProvider> PROVIDER_TABLE;
+    private static final List<EchoExpressionResolver> PRECEDENCED_TABLE;
 
     static {
-        PROVIDER_TABLE = new HashMap<>();
-        PROVIDER_TABLE.put("!", EchoTextExpression::newInstance);
-        PROVIDER_TABLE.put("!size", EchoTextExpression::newInstance);
-        PROVIDER_TABLE.put("!color", EchoTextExpression::newInstance);
-        PROVIDER_TABLE.put("!bgcolor", EchoTextExpression::newInstance);
-        PROVIDER_TABLE.put("@", EchoLinkDocumentExpression::new);
-        PROVIDER_TABLE.put("li", EchoListExpression::newInstance);
-        PROVIDER_TABLE.put("nli", EchoListExpression::newInstance);
-        PROVIDER_TABLE.put("+", EchoNoteExpression::new);
+        PRECEDENCED_TABLE = new ArrayList<>();
+
+        PRECEDENCED_TABLE.add(
+                new EchoExpressionResolver("!"::equals, EchoTextExpression::newInstance));
+        PRECEDENCED_TABLE.add(
+                new EchoExpressionResolver("!size"::equals, EchoTextExpression::newInstance));
+        PRECEDENCED_TABLE.add(
+                new EchoExpressionResolver("!color"::equals, EchoTextExpression::newInstance));
+        PRECEDENCED_TABLE.add(
+                new EchoExpressionResolver("!bgcolor"::equals, EchoTextExpression::newInstance));
+        PRECEDENCED_TABLE.add(
+                new EchoExpressionResolver("@"::equals, EchoLinkDocumentExpression::new));
+        PRECEDENCED_TABLE.add(
+                new EchoExpressionResolver(
+                        (key) -> key.equals("li") || key.startsWith("#") || key.startsWith("nli"),
+                        EchoListExpression::newInstance));
+        PRECEDENCED_TABLE.add(
+                new EchoExpressionResolver("+"::equals, EchoNoteExpression::new));
     }
 
-    private EchoExpressionFactory() {}
+    private EchoExpressionFactory() {
+    }
 
     public static Expression newInstance(String expString, String expression, @Nullable String value, @Nullable String arguments) {
         if (expression == null)
             return new LiteralExpression(expString, null, null, null);
         expression = expression.trim();
-        Expression instance = null;
-        EchoExpressionProvider provider = PROVIDER_TABLE.get(expression);
+        EchoExpressionProvider provider = null;
+        for (EchoExpressionResolver resolver : PRECEDENCED_TABLE) {
+            if (resolver.predicate.test(expression)) {
+                provider = resolver.provider;
+                break;
+            }
+        }
         if (provider == null)
             throw new MalformedExpressionException(String.format("Unknown expression [%s] in string [%s]", expression, expString));
         return provider.provide(expString, expression, value, arguments);
@@ -37,5 +54,11 @@ public final class EchoExpressionFactory {
     @FunctionalInterface
     private interface EchoExpressionProvider {
         AbstractEchoExpression provide(String expString, String expression, String value, String arguments);
+    }
+
+    @AllArgsConstructor
+    private static class EchoExpressionResolver {
+        Predicate<String> predicate;
+        EchoExpressionProvider provider;
     }
 }

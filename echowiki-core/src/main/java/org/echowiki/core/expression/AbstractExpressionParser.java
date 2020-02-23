@@ -1,5 +1,7 @@
 package org.echowiki.core.expression;
 
+import org.apache.logging.log4j.util.Strings;
+
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkElementIndex;
 
@@ -14,6 +16,7 @@ public abstract class AbstractExpressionParser implements ExpressionParser {
     }
 
     boolean isWrapped(String expString, char openBracket, char closeBracket) {
+        if (Strings.isBlank(expString)) return false;
         expString = expString.trim();
         return expString.charAt(0) == openBracket
                 && expString.charAt(expString.length() - 1) == closeBracket;

@@ -44,11 +44,17 @@ public abstract class AbstractExpression implements Expression, PropertyChangeLi
      * @param expression
      */
     public void addExpression(Expression expression) {
+        addListener(expression);
+        this.innerExpression = expression;
+    }
+
+    void addListener(Expression expression) {
         if (expression instanceof AbstractExpression) {
             AbstractExpression instance = (AbstractExpression) expression;
             instance.support.addPropertyChangeListener(this);
+        } else {
+            throw new UnsupportedOperationException(String.format("Unsupported registering listener for class [%s]", expression.getClass()));
         }
-        this.innerExpression = expression;
     }
 
     @Override
@@ -89,7 +95,7 @@ public abstract class AbstractExpression implements Expression, PropertyChangeLi
         else
             el = new SimpleElement(getElementType());
         hookElement(el);
-        support.firePropertyChange(new PropertyChangeEvent(this, expression, null, this));
+        support.firePropertyChange(new PropertyChangeEvent(this, expression, null, el));
         return el;
     }
 

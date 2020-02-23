@@ -3,14 +3,15 @@ package org.echowiki.core.expression;
 
 import org.apache.logging.log4j.util.Strings;
 
+import java.util.regex.Pattern;
+
 import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 public class ScopeExpressionParser extends AbstractExpressionParser implements ExpressionParser {
-    public static final char ESCAPE = '\\';
     public static final char OPEN_BRACKET = '=';
     public static final char CLOSE_BRACKET = '=';
-    public static final char OPEN_ECHO_BRACKET = '{';
-    public static final char CLOSE_ECHO_BRACKET = '}';
+    private static final Pattern SCOPE_PATTERN = Pattern.compile("={2,} .* ={2,}");
     private final EchoExpressionParser echoParser = new EchoExpressionParser();
 
     @Override
@@ -22,6 +23,20 @@ public class ScopeExpressionParser extends AbstractExpressionParser implements E
             return ScopeExpressionFactory.newInstance(expString, null, null, null, null);
         else
             return internalParse(expString);
+    }
+
+//    String[] getScopeBoundaries(String rawText) {
+//
+//    }
+
+    public boolean scopeExpressionEnd(String line) {
+        return scopeClosed(line);
+    }
+
+    public boolean scopeExpressionStart(String line) {
+        checkNotNull(line);
+        line = line.trim();
+        return SCOPE_PATTERN.matcher(line).matches();
     }
 
     private ScopeExpression internalParse(String expString) {
@@ -43,7 +58,7 @@ public class ScopeExpressionParser extends AbstractExpressionParser implements E
         if (startLine.charAt(0) != OPEN_BRACKET)
             throw new MalformedExpressionException(String.format("Malformed Scope Expression [%s]", startLine));
         validateWrapperConsistency(startLine);
-        if (isWrapped(lastLine, OPEN_BRACKET, CLOSE_BRACKET)) {
+        if (splittedLine.length != 1 && isWrapped(lastLine, OPEN_BRACKET, CLOSE_BRACKET)) {
             validateWrapperConsistency(lastLine);
             String expression = getEchoExpressionInString(lastLine);
             expression = echoParser.getExpressionInString(expression);
@@ -52,7 +67,16 @@ public class ScopeExpressionParser extends AbstractExpressionParser implements E
         }
     }
 
+    private boolean scopeClosed(String line) {
+        if (!isWrapped(line, OPEN_BRACKET, CLOSE_BRACKET))
+            return false;
+        String expression = getEchoExpressionInString(line);
+        String expressionInEcho = echoParser.getExpressionInString(expression);
+        return expressionInEcho.startsWith("/") && !isCharEscaped(expressionInEcho, 0);
+    }
+
     private void validateWrapperConsistency(String wrappedLine) {
+        wrappedLine = wrappedLine.trim();
         if (!isWrapped(wrappedLine, OPEN_BRACKET, CLOSE_BRACKET))
             throw new MalformedExpressionException(String.format("Malformed Wrapper in Expression [%s]", wrappedLine));
         String wrapper = getWrapperInString(wrappedLine);
@@ -62,6 +86,7 @@ public class ScopeExpressionParser extends AbstractExpressionParser implements E
     }
 
     String getWrapperInString(String startLine) {
+        startLine = startLine.trim();
         StringBuilder stringBuilder = new StringBuilder();
         int start = 0;
         while (start < startLine.length()
@@ -79,6 +104,7 @@ public class ScopeExpressionParser extends AbstractExpressionParser implements E
     }
 
     String getEchoExpressionInString(String startLine) {
+        startLine = startLine.trim();
         int start = 0;
         while (start < startLine.length()
                 && (startLine.charAt(start) == OPEN_BRACKET))

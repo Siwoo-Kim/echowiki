@@ -28,8 +28,8 @@ public class SimpleParagraphContext implements ParagraphContext {
         this.encodedLines = encodedLines.clone();
         this.context = scopeExpression;
         this.scopeContext = scopeExpression.evaluate();
-        this.expressions = new HashMap<>(mapper);
-        elements = new HashMap<>();
+        this.expressions = new LinkedHashMap<>(mapper);
+        elements = new LinkedHashMap<>();
         for (String key : expressions.keySet()) {
             Expression expression = expressions.get(key);
             elements.put(key, expression.evaluate());

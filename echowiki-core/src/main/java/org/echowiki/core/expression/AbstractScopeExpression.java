@@ -1,6 +1,7 @@
 package org.echowiki.core.expression;
 
 
+import org.echowiki.core.expression.element.Element;
 import org.echowiki.core.expression.element.ElementType;
 
 import java.beans.PropertyChangeEvent;
@@ -14,16 +15,23 @@ public abstract class AbstractScopeExpression extends AbstractExpression impleme
     public static final ElementType type = ElementType.SCOPE;
     private static final String OPENING_BRACKET = "==";
     private static final String CLOSING_BRACKET = "==";
-    private final List<Expression> expressions = new ArrayList<>();
+    private final List<Expression> echoExpressions = new ArrayList<>();
     private final int depth;
     private final boolean closed;
+    private int listIndex = EchoListExpression.FIRST_ITEM;
+
+    AbstractScopeExpression(String expString) {
+        super(expString, null, null, null);
+        depth = 0;
+        closed = false;
+    }
 
     AbstractScopeExpression(String expString, String expression, String rawValue, String arguments, String wrapper) {
         super(expString, expression, rawValue, arguments);
         checkArgument(wrapper.startsWith(OPENING_BRACKET)
                 && wrapper.endsWith(CLOSING_BRACKET));
 
-        String lastLine = StringHelper.lastLineOf(expString);
+        String lastLine = StringHelper.lastLineOf(expString).trim();
         if (lastLine != null)
             closed = lastLine.startsWith(OPENING_BRACKET)
                     && lastLine.endsWith(CLOSING_BRACKET);
@@ -31,6 +39,10 @@ public abstract class AbstractScopeExpression extends AbstractExpression impleme
             closed = false;
         int depth = wrapper.split(" ")[0].length();
         this.depth = depth - 2;
+    }
+
+    public List<Expression> getExpressionInScope() {
+        return new ArrayList<>(echoExpressions);
     }
 
     @Override
@@ -50,13 +62,21 @@ public abstract class AbstractScopeExpression extends AbstractExpression impleme
 
     @Override
     public void addExpression(Expression expression) {
-        super.addExpression(expression);
-        if (!expressions.contains(expression))
-            expressions.add(expression);
+        if (expression instanceof AbstractScopeExpression)
+            super.addExpression(expression);
+        else if (!echoExpressions.contains(expression)) {
+            echoExpressions.add(expression);
+            addListener(expression);
+        }
     }
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-
+        Expression exp = (Expression) evt.getSource();
+        if (exp instanceof EchoListExpression) {
+            Element el = (Element) evt.getNewValue();
+            EchoListExpression listExp = (EchoListExpression) exp;
+            this.listIndex = listExp.handleIndexOfList(el, listIndex);
+        }
     }
 }

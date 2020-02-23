@@ -18,7 +18,7 @@ public final class ScopeExpressionFactory {
 
     public static ScopeExpression newInstance(String expString, String exp, String arguments, String value, String wrapper) {
         if (wrapper == null)
-            return new RegularScopeExpression(expString);
+            return new StubScopeExpression(expString);
         ScopeExpressionProvider provider;
         if (!EchoExpressionParser.isEchoExpression(exp))
             provider = DEFAULT_PROVIDER;

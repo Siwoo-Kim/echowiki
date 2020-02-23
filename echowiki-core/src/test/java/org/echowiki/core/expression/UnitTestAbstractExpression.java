@@ -143,8 +143,8 @@ public class UnitTestAbstractExpression {
                 firedElement.add((Expression) evt.getSource());
             }
         };
-        AbstractExpression innerMost = new AbstractExpression("{@(한국사):{+:{!color(orange):{!:'This is test'}}}", "!", "'This is test", "orange") {
 
+        AbstractExpression innerMost = new AbstractExpression("{@(한국사):{+:{!color(orange):{!:'This is test'}}}", "!", "'This is test", "orange") {
             @Override
             protected void hookElement(Element el) {
                 el.addAttribute(new TestAttribute("innerMost", "innerMost"));
@@ -168,7 +168,7 @@ public class UnitTestAbstractExpression {
         Element element = outerMost.evaluate();
         List<String> keys = element.attributes().stream().map(Attribute::key).collect(Collectors.toList());
         List<String> values = element.attributes().stream().map(Attribute::value).collect(Collectors.toList());
-        assertThat(keys, hasItems("outerMost", "outer", "inner", "innerMost", "literal"));
+        assertThat(keys, hasItems("outerMost", "outer", "inner", "innerMost", "echo-literal"));
         assertThat(values, hasItems("outerMost", "outer", "inner", "innerMost", "'This is test'"));
     }
 

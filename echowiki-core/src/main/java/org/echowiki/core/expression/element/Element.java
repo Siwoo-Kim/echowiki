@@ -42,6 +42,16 @@ public interface Element {
     List<Attribute> attributes();
 
     /**
+     * returns the attribute of the given {@link AttributeType} and key.
+     *
+     * @throws IllegalArgumentException {@code type == null || key == null}
+     * @param type
+     * @param key
+     * @return
+     */
+    List<Attribute> getAttributes(AttributeType type, String key);
+
+    /**
      * returns attributes which in the given {@link AttributeType}
      *
      * @param type

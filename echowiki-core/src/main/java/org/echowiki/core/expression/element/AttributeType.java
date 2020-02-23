@@ -1,7 +1,5 @@
 package org.echowiki.core.expression.element;
 
-import java.util.List;
-
 import static org.echowiki.core.expression.element.ElementType.*;
 
 public enum AttributeType {
