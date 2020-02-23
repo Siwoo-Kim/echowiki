@@ -10,9 +10,18 @@ import org.echowiki.core.expression.element.*;
  * {nli:Output Message} => 1. Output Message
  * {nli:Output Message} => 2. Output Message
  * {nli:Output Message} => 3. Output Message
+ *
+ * {#:Output Message}
+ * {#1: Output Message}
+ * {#2: Output Message}
+ * {#2: Output Message/} => termination
  */
 //@todo better way to specifying line elements.
 public abstract class EchoListExpression extends AbstractEchoExpression {
+
+    public static final String TERMINATION_SYMBOL = "/";
+    public static final int FIRST_ITEM = 1;
+    public static final String ITEM_VALUE_FORMAT = "item-%d";
 
     EchoListExpression(String expString, String expression, String rawValue, String arguments) {
         super(expString, expression, rawValue, arguments);
@@ -22,7 +31,8 @@ public abstract class EchoListExpression extends AbstractEchoExpression {
         switch (expression) {
             case EchoRegularListExpression.DEFINED_EXPRESSION:
                 return new EchoRegularListExpression(expString, expression, rawValue, arguments);
-            case EchoNumberListExpression.DEFINED_EXPRESION:
+            case EchoNumberListExpression.DEFINED_EXPRESION1:
+            case EchoNumberListExpression.DEFINED_EXPRESION2:
                 return new EchoNumberListExpression(expString, expression, rawValue, arguments);
         }
         throw new MalformedExpressionException(String.format("Unknown Expression [%s]", expString));
@@ -35,6 +45,20 @@ public abstract class EchoListExpression extends AbstractEchoExpression {
 
     abstract Attribute attribute();
 
+    public int handleIndexOfList(Element el, int lastIndex) {
+        AttributeKey type = AttributeKey.WIKI_LIST_NUMBER;
+        el.addAttribute(new SimpleAttribute(type.type(), type.key(), String.format(ITEM_VALUE_FORMAT, lastIndex++)));
+        if (isTerminated())
+            return FIRST_ITEM;
+        else
+            return lastIndex;
+    }
+
+    private boolean isTerminated() {
+        return value() != null &&
+                !StringHelper.isCharEscaped(value(), value().length()-1) &&
+                value().endsWith(TERMINATION_SYMBOL);
+    }
 
     private static class EchoRegularListExpression extends EchoListExpression {
         public static final String ATTRIBUTE_VALUE = "regular";
@@ -54,7 +78,8 @@ public abstract class EchoListExpression extends AbstractEchoExpression {
     private static class EchoNumberListExpression extends EchoListExpression {
         public static final String ATTRIBUTE_VALUE = "number";
         private static final AttributeKey LIST_NUMBER = AttributeKey.WIKI_LIST_NUMBER;
-        private static final String DEFINED_EXPRESION = "nli";
+        private static final String DEFINED_EXPRESION1 = "#";
+        private static final String DEFINED_EXPRESION2 = "nli";
 
         EchoNumberListExpression(String expString, String expression, String rawValue, String arguments) {
             super(expString, expression, rawValue, arguments);

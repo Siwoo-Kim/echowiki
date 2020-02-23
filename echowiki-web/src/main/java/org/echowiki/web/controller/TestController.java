@@ -11,6 +11,7 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.inject.Inject;
 import javax.jws.WebParam;
 import javax.servlet.jsp.PageContext;
+import java.util.List;
 
 @Controller
 @RequestMapping("/test")
@@ -29,7 +30,7 @@ public class TestController {
 
     @PostMapping
     public String parsing(@RequestParam(name = "text") String text, Model model) {
-        ParagraphContext paragraphContext = expressionEngine.encoding(text);
+        List<ParagraphContext> paragraphContext = expressionEngine.encodingDocument(text);
         model.addAttribute("paragraph", paragraphContext);
         return "test";
     }

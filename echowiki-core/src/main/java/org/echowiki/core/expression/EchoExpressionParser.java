@@ -159,6 +159,7 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
         return LINE_PATTERN.matcher(line).find() || LINE_PATTERN.matcher(line).matches();
     }
 
+    //bug
     public String getEchoExpressionInLine(String line) {
         Matcher matcher = LINE_PATTERN.matcher(line);
         if (!matcher.find())

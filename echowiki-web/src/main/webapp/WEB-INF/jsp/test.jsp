@@ -4,7 +4,6 @@
 <%@ page import="org.echowiki.core.domain.Category" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<c:set var="category" value="${categories.get(0)}" scope="request"/>
 
 <html>
 <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
@@ -19,8 +18,14 @@
         font-feature-settings: "liga" off,"calt" off;
     }
 
+    div.result {
+        margin-top: 0px;
+    }
+
     textarea {
-        height: 400px;
+        overflow: scroll;
+        height: 600px;
+        scroll-behavior: smooth;
         width: 100%;
     }
 </style>
@@ -35,22 +40,28 @@
                 <button class="btn btn-primary" type="submit">Parsing</button>
             </form>
         </div>
-        <div class="col-6">
-            <pre>
-                <c:if test="${paragraph != null}">
-                    <hr>
-                    ${paragraph.encodedString()}
-                    <hr>
-                    ${paragraph.decodedString()}
-                </c:if>
-            </pre>
+        <div class="col-6 result">
+            <c:forEach items="${paragraph}" var="p">
+            <div class="card">
+                <pre>
+                    <c:if test="${p != null}">
+                        <hr>
+                        ${p.encodedString()}
+                        <hr>
+                        ${p.decodedString()}
+                    </c:if>
+                </pre>
+            </div>
+            </c:forEach>
         </div>
         <div class="col-12">
             <div class="list-group">
-                <c:forEach items="${paragraph.elements}" var="e">
-                    <a class="list-group-item">
-                        ${e}
-                    </a>
+                <c:forEach items="${paragraph}" var="p">
+                    <c:forEach items="${p.elements}" var="e">
+                        <a class="list-group-item">
+                                ${e}
+                        </a>
+                    </c:forEach>
                 </c:forEach>
             </div>
         </div>

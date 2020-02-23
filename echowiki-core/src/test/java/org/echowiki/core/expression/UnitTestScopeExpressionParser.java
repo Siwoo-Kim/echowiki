@@ -123,4 +123,10 @@ public class UnitTestScopeExpressionParser {
                 "== 개요 ==\n";
         scopeExpressionParser.validateScope(STRING);
     }
+
+    @Test
+    public void unitTestValidateScopeExpression5() {
+        String STRING = "== 개요 ==";
+        scopeExpressionParser.validateScope(STRING);
+    }
 }

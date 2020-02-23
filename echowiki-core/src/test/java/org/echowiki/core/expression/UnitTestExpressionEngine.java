@@ -47,7 +47,7 @@ public class UnitTestExpressionEngine {
                 " {li:북동쪽 방향: 45deg}\n" +
                 " {li:동쪽 방향: 90deg}\n" +
                 "=== {/p} ===";
-        ParagraphContext context = engine.encoding(TEXT);
+        ParagraphContext context = engine.encodingParagraph(TEXT);
 
     }
 }

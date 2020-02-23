@@ -46,6 +46,18 @@ public class SimpleElement implements Element {
     }
 
     @Override
+    public List<Attribute> getAttributes(AttributeType type, String key) {
+        checkNotNull(type, key);
+        if (!attributes.containsKey(type))
+            return null;
+        List<Attribute> result = new ArrayList<>();
+        for (Attribute attribute: attributes.get(type))
+            if (attribute.key().equals(key))
+                result.add(attribute);
+        return result;
+    }
+
+    @Override
     public List<Attribute> attributes(AttributeType type) {
         checkNotNull(type);
         return new ArrayList<>(attributes.get(type));
