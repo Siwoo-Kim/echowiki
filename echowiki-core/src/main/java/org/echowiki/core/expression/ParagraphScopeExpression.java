@@ -9,6 +9,9 @@ import org.echowiki.core.expression.element.SimpleAttribute;
  * <p>
  * == {p:value} ==
  * == {/p} ==
+ *
+ * == topic1 ==
+ * == {/} ==
  */
 public class ParagraphScopeExpression extends AbstractScopeExpression {
 
