@@ -44,7 +44,5 @@ public class UnitTestSimpleExpressionEngine {
                 " {li:동쪽 방향: 90deg}\n" +
                 "=== {/p} ===";
         Paragraph paragraph = engine.encodingParagraph(TEXT);
-
-
     }
 }

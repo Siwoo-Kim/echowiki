@@ -1,21 +1,21 @@
 package org.echowiki.core.expression;
 
-import org.echowiki.core.expression.element.AttributeKey;
 import org.echowiki.core.expression.element.Element;
-import org.echowiki.core.expression.element.SimpleAttribute;
+import org.echowiki.core.expression.element.WIKI;
 
 /**
  * The class represents the paragraph of the wiki page.
  * <p>
  * == {p:value} ==
  * == {/p} ==
- *
+ * <p>
  * == topic1 ==
  * == {/} ==
  */
 public class ParagraphScopeExpression extends AbstractScopeExpression {
 
-    AttributeKey WIKI_PARAGRAPH = AttributeKey.WIKI_PARAGRAPH;
+    WIKI WIKI_PARAGRAPH = WIKI.WIKI_PARAGRAPH;
+    private final String[] IDENTIFIERS = new String[]{"", "p"};
 
     ParagraphScopeExpression(String expString, String expression, String rawValue, String arguments, String wrapper) {
         super(expString, expression, rawValue, arguments, wrapper);
@@ -23,7 +23,12 @@ public class ParagraphScopeExpression extends AbstractScopeExpression {
 
     @Override
     void hookElement(Element el) {
-        el.addAttribute(new SimpleAttribute(WIKI_PARAGRAPH.type(), WIKI_PARAGRAPH.key(), "title=" + value()));
-        el.addAttribute(new SimpleAttribute(WIKI_PARAGRAPH.type(), WIKI_PARAGRAPH.key(), "depth=" + depth()));
+        el.addValue(WIKI_PARAGRAPH.key(), "title=" + value());
+        el.addValue(WIKI_PARAGRAPH.key(), "depth=" + value());
+    }
+
+    @Override
+    String[] identifiers() {
+        return IDENTIFIERS.clone();
     }
 }

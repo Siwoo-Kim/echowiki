@@ -2,7 +2,7 @@ package org.echowiki.core.expression;
 
 
 import org.echowiki.core.expression.element.Element;
-import org.echowiki.core.expression.element.ElementType;
+import org.echowiki.core.expression.element.Scope;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
@@ -12,7 +12,7 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public abstract class AbstractScopeExpression extends AbstractExpression implements ScopeExpression {
 
-    public static final ElementType type = ElementType.SCOPE;
+    public static final Scope type = Scope.SECTION;
     private static final String OPENING_BRACKET = "==";
     private static final String CLOSING_BRACKET = "==";
     private final List<Expression> echoExpressions = new ArrayList<>();
@@ -56,7 +56,7 @@ public abstract class AbstractScopeExpression extends AbstractExpression impleme
     }
 
     @Override
-    ElementType getElementType() {
+    Scope getElementType() {
         return type;
     }
 

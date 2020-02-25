@@ -1,16 +1,14 @@
 package org.echowiki.core.expression;
 
-import org.echowiki.core.expression.element.AttributeKey;
-import org.echowiki.core.expression.element.AttributeType;
 import org.echowiki.core.expression.element.Element;
-import org.echowiki.core.expression.element.SimpleAttribute;
+import org.echowiki.core.expression.element.WIKI;
 
 /**
  * {+(linking message): Note Message}
  */
 public class EchoNoteExpression extends AbstractEchoExpression {
-    private static final String[] DEFINED_EXPRESSIONS = {"+"};
-    private static final AttributeKey WIKI_NOTE = AttributeKey.WIKI_NOTE;
+    private static final String[] IDENTIFIER = {"+"};
+    private static final WIKI WIKI_NOTE = WIKI.WIKI_NOTE;
 
     EchoNoteExpression(String expString, String expression, String rawValue, String arguments) {
         super(expString, expression, rawValue, arguments);
@@ -18,6 +16,12 @@ public class EchoNoteExpression extends AbstractEchoExpression {
 
     @Override
     protected void hookElement(Element el) {
-        el.addAttribute(new SimpleAttribute(WIKI_NOTE.type(), WIKI_NOTE.key(), arguments()));
+        el.addValue(WIKI_NOTE.key(), "message=" + arguments());
+        el.addValue(WIKI_NOTE.key(), "note=" + getLiteral());
+    }
+
+    @Override
+    String[] identifiers() {
+        return IDENTIFIER;
     }
 }

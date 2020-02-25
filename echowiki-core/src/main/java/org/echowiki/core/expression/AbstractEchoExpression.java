@@ -1,6 +1,6 @@
 package org.echowiki.core.expression;
 
-import org.echowiki.core.expression.element.ElementType;
+import org.echowiki.core.expression.element.Scope;
 
 public abstract class AbstractEchoExpression extends AbstractExpression {
 
@@ -9,7 +9,7 @@ public abstract class AbstractEchoExpression extends AbstractExpression {
     }
 
     @Override
-    ElementType getElementType() {
-        return ElementType.ECHO;
+    Scope getElementType() {
+        return Scope.LINE;
     }
 }

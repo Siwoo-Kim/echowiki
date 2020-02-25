@@ -17,4 +17,9 @@ public class StubScopeExpression extends AbstractScopeExpression implements Scop
     void hookElement(Element el) {
 
     }
+
+    @Override
+    String[] identifiers() {
+        return new String[0];
+    }
 }

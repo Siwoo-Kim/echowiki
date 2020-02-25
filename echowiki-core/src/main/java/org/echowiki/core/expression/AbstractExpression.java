@@ -4,8 +4,8 @@ import com.google.common.base.MoreObjects;
 import com.sun.istack.Nullable;
 import org.apache.logging.log4j.util.Strings;
 import org.echowiki.core.expression.element.Element;
-import org.echowiki.core.expression.element.ElementType;
-import org.echowiki.core.expression.element.SimpleElement;
+import org.echowiki.core.expression.element.Elements;
+import org.echowiki.core.expression.element.Scope;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -93,7 +93,7 @@ public abstract class AbstractExpression implements Expression, PropertyChangeLi
         if (innerExpression != null)
             el = innerExpression.evaluate();    //from nested
         else
-            el = new SimpleElement(getElementType());
+            el = Elements.newElement(getElementType());
         hookElement(el);
         support.firePropertyChange(new PropertyChangeEvent(this, expression, null, el));
         return el;
@@ -118,9 +118,16 @@ public abstract class AbstractExpression implements Expression, PropertyChangeLi
 
     /**
      * @return
-     * @implSpec subclass should define it's {@link ElementType}.
+     * @implSpec subclass should define it's {@link Scope}.
      */
-    abstract ElementType getElementType();
+    abstract Scope getElementType();
+
+    /**
+     * returns id of the expression
+     *
+     * @return
+     */
+    abstract String[] identifiers();
 
     @Override
     public void propertyChange(PropertyChangeEvent evt) {

@@ -3,25 +3,24 @@ package org.echowiki.core.expression.element;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static com.google.common.base.Preconditions.checkNotNull;
 
-@EqualsAndHashCode(of = {"type", "key", "value"})
-@ToString(of = {"type", "key", "value"})
+@EqualsAndHashCode(of = "key")
+@ToString(of = "key")
 public class SimpleAttribute implements Attribute {
-    private final AttributeType type;
     private final String key;
-    private final String value;
+    private final List<String> values = new ArrayList<>();
 
-    public SimpleAttribute(AttributeType type, String key, String value) {
-        checkNotNull(type, key);
-        this.type = type;
+    SimpleAttribute(String key) {
         this.key = key;
-        this.value = value;
     }
 
     @Override
-    public AttributeType type() {
-        return type;
+    public WIKI wiki() {
+        return WIKI.fromString(key);
     }
 
     @Override
@@ -29,9 +28,14 @@ public class SimpleAttribute implements Attribute {
         return key;
     }
 
-    @Override
-    public String value() {
-        return value;
+    public void addValue(String value) {
+        checkNotNull(value);
+        if (!values.contains(value))
+            values.add(value);
     }
 
+    @Override
+    public List<String> values() {
+        return new ArrayList<>(values);
+    }
 }

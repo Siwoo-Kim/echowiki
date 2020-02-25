@@ -1,13 +1,12 @@
 package org.echowiki.core.expression;
 
-import org.echowiki.core.expression.element.AttributeKey;
+import org.echowiki.core.expression.element.WIKI;
 import org.echowiki.core.expression.element.Element;
-import org.echowiki.core.expression.element.ElementType;
-import org.echowiki.core.expression.element.SimpleAttribute;
+import org.echowiki.core.expression.element.Scope;
 
 public class LiteralExpression extends AbstractExpression {
 
-    private static final AttributeKey WIKI_LITERAL = AttributeKey.WIKI_LITERAL;
+    private static final WIKI WIKI_LITERAL = WIKI.WIKI_LITERAL;
 
     LiteralExpression(String expString, String expression, String rawValue, String arguments) {
         super(expString, expression, rawValue, arguments);
@@ -20,12 +19,17 @@ public class LiteralExpression extends AbstractExpression {
 
     @Override
     protected void hookElement(Element el) {
-        el.addAttribute(new SimpleAttribute(WIKI_LITERAL.type(), WIKI_LITERAL.key(), value()));
+        el.addValue(WIKI_LITERAL.key(), value());
     }
 
     @Override
-    protected ElementType getElementType() {
-        return WIKI_LITERAL.type().type();
+    protected Scope getElementType() {
+        return WIKI_LITERAL.type();
+    }
+
+    @Override
+    String[] identifiers() {
+        return new String[0];
     }
 
 }

@@ -7,8 +7,8 @@ import org.echowiki.core.expression.element.*;
  */
 public class EchoLinkDocumentExpression extends AbstractEchoExpression {
 
-    private final AttributeKey WIKI_LINK = AttributeKey.WIKI_LINK;
-    public static final String[] DEFINED_EXPRESSIONS = {"@"};
+    private final WIKI WIKI_LINK = WIKI.WIKI_LINK;
+    public static final String[] IDENTIFIERS = {"@"};
 
     EchoLinkDocumentExpression(String expString, String expression, String rawValue, String arguments) {
         super(expString, expression, rawValue, arguments);
@@ -16,8 +16,12 @@ public class EchoLinkDocumentExpression extends AbstractEchoExpression {
 
     @Override
     protected void hookElement(Element el) {
-        el.addAttribute(new SimpleAttribute(WIKI_LINK.type(),
-                WIKI_LINK.key(),
-                arguments()));
+        el.addValue(WIKI_LINK.key(), arguments());
     }
+
+    @Override
+    String[] identifiers() {
+        return IDENTIFIERS.clone();
+    }
+
 }
