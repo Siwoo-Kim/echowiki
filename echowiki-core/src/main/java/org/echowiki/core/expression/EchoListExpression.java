@@ -2,6 +2,11 @@ package org.echowiki.core.expression;
 
 import org.echowiki.core.expression.element.*;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Stream;
+
 /**
  * {li:Output Message}   => * Output Message
  * {li:Output Message}   => * Output Message
@@ -15,39 +20,53 @@ import org.echowiki.core.expression.element.*;
  * {#1: Output Message}
  * {#2: Output Message}
  * {#2: Output Message/} => termination
+ *
+ * {type={number|regular},{index=[Number]}}
  */
 //@todo better way to specifying line elements.
 public abstract class EchoListExpression extends AbstractEchoExpression {
-
+    private static final List<ExpressionProvider> providers = new ArrayList<>();
+    private static final WIKI WIKI_LIST = WIKI.WIKI_LIST;
     public static final String TERMINATION_SYMBOL = "/";
     public static final int FIRST_ITEM = 1;
     public static final String ITEM_VALUE_FORMAT = "item-%d";
+
+    static {
+        providers.add(ExpressionProvider.builder()
+                .checkIdentifier(e -> e.equals(EchoRegularListExpression.IDENTIFIER))
+                .initializer(EchoRegularListExpression::new)
+                .build());
+        providers.add(ExpressionProvider.builder()
+                .checkIdentifier(e -> Arrays.asList(EchoNumberListExpression.IDENTIFIERS).contains(e))
+                .initializer(EchoNumberListExpression::new)
+                .build());
+    }
 
     EchoListExpression(String expString, String expression, String rawValue, String arguments) {
         super(expString, expression, rawValue, arguments);
     }
 
+    //@todo refactoring
     static AbstractEchoExpression newInstance(String expString, String expression, String rawValue, String arguments) {
-        switch (expression) {
-            case EchoRegularListExpression.DEFINED_EXPRESSION:
-                return new EchoRegularListExpression(expString, expression, rawValue, arguments);
-            case EchoNumberListExpression.DEFINED_EXPRESION1:
-            case EchoNumberListExpression.DEFINED_EXPRESION2:
+        if (expression.equals(EchoRegularListExpression.IDENTIFIER))
+            return new EchoRegularListExpression(expString, expression, rawValue, arguments);
+        for (String exp: EchoNumberListExpression.IDENTIFIERS) {
+            if (exp.equals(expression))
                 return new EchoNumberListExpression(expString, expression, rawValue, arguments);
         }
+
         throw new MalformedExpressionException(String.format("Unknown Expression [%s]", expString));
     }
 
     @Override
     protected void hookElement(Element el) {
-        el.addAttribute(attribute());
+        el.addValue(WIKI_LIST.key(), "type=" + getAttributeValue());
     }
 
-    abstract Attribute attribute();
+    abstract String getAttributeValue();
 
     public int handleIndexOfList(Element el, int lastIndex) {
-        AttributeKey type = AttributeKey.WIKI_LIST_NUMBER;
-        el.addAttribute(new SimpleAttribute(type.type(), type.key(), String.format(ITEM_VALUE_FORMAT, lastIndex++)));
+        el.addValue(WIKI_LIST.key(), "index=" + String.format(ITEM_VALUE_FORMAT, lastIndex++));
         if (isTerminated())
             return FIRST_ITEM;
         else
@@ -62,32 +81,39 @@ public abstract class EchoListExpression extends AbstractEchoExpression {
 
     private static class EchoRegularListExpression extends EchoListExpression {
         public static final String ATTRIBUTE_VALUE = "regular";
-        private static final AttributeKey LIST_REGULAR = AttributeKey.WIKI_LIST_REGULAR;
-        private static final String DEFINED_EXPRESSION = "li";
+        private static final String IDENTIFIER = "li";
 
         public EchoRegularListExpression(String expString, String expression, String rawValue, String arguments) {
             super(expString, expression, rawValue, arguments);
         }
 
         @Override
-        Attribute attribute() {
-            return new SimpleAttribute(LIST_REGULAR.type(), LIST_REGULAR.key(), ATTRIBUTE_VALUE);
+        String[] identifiers() {
+            return new String[]{IDENTIFIER};
+        }
+
+        @Override
+        String getAttributeValue() {
+            return ATTRIBUTE_VALUE;
         }
     }
 
     private static class EchoNumberListExpression extends EchoListExpression {
         public static final String ATTRIBUTE_VALUE = "number";
-        private static final AttributeKey LIST_NUMBER = AttributeKey.WIKI_LIST_NUMBER;
-        private static final String DEFINED_EXPRESION1 = "#";
-        private static final String DEFINED_EXPRESION2 = "nli";
+        private static final String[] IDENTIFIERS = new String[]{"#", "nli"};
 
         EchoNumberListExpression(String expString, String expression, String rawValue, String arguments) {
             super(expString, expression, rawValue, arguments);
         }
 
         @Override
-        Attribute attribute() {
-            return new SimpleAttribute(LIST_NUMBER.type(), LIST_NUMBER.key(), ATTRIBUTE_VALUE);
+        String[] identifiers() {
+            return IDENTIFIERS.clone();
+        }
+
+        @Override
+        String getAttributeValue() {
+            return ATTRIBUTE_VALUE;
         }
     }
 }

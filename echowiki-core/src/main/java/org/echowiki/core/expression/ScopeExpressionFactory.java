@@ -1,8 +1,12 @@
 package org.echowiki.core.expression;
 
 
+import org.apache.logging.log4j.util.Strings;
+
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.google.common.base.Preconditions.checkArgument;
 
 public final class ScopeExpressionFactory {
 
@@ -16,6 +20,27 @@ public final class ScopeExpressionFactory {
         PROVIDER_TABLE.put("p", ParagraphScopeExpression::new);
     }
 
+    /**
+     * returns new instance of the {@link StubScopeExpression}.
+     *
+     * @param expString
+     * @return
+     */
+    public static ScopeExpression stubScope(String expString) {
+        checkArgument(Strings.isNotBlank(expString));
+        return new StubScopeExpression(expString);
+    }
+
+    /**
+     * returns the new instance of {@link ScopeExpression}
+     *
+     * @param expString
+     * @param exp
+     * @param arguments
+     * @param value
+     * @param wrapper
+     * @return
+     */
     public static ScopeExpression newInstance(String expString, String exp, String arguments, String value, String wrapper) {
         if (wrapper == null)
             return new StubScopeExpression(expString);

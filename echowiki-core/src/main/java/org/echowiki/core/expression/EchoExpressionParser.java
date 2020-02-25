@@ -10,7 +10,6 @@ import static com.google.common.base.Preconditions.checkArgument;
 
 public class EchoExpressionParser extends AbstractExpressionParser implements ExpressionParser {
 
-    public static final char ESCAPE = '\\';
     public static final char OPEN_BRACKET = '{';
     public static final char CLOSE_BRACKET = '}';
     public static final char FUNCTION_OPEN_BRACKET = '(';
@@ -20,10 +19,10 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
     //{exp[(args, args..)]?:[value|exp]}
     private static final Pattern ECHO_PATTERN = Pattern.compile("^\\{.+}$");
     //negative lookbehind
-    private static final Pattern LINE_PATTERN = Pattern.compile("(?<!\\\\)\\{.*[^\\\\]}");
+    private static final Pattern LINE_PATTERN = Pattern.compile("(?<!\\\\)\\{.*?[^\\\\]}+");
 
     static boolean isEchoExpression(String expString) {
-        if (expString == null) return false;
+        if (Strings.isBlank(expString)) return false;
         return ECHO_PATTERN.matcher(expString).matches();
     }
 
@@ -68,15 +67,31 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
         return rootExpression;
     }
 
+    @Override
+    public boolean isExpression(String expression) {
+        return isEchoExpression(expression);
+    }
+
+    @Override
+    public boolean hasExpression(String string) {
+        return hasEchoExpressionInLine(string);
+    }
+
     private Expression internalParse(String expString) {
         checkArgument(Strings.isNotBlank(expString));
         String copiedExpString = stripOffWrapper(expString, OPEN_BRACKET, CLOSE_BRACKET);
         String value = getValueInString(copiedExpString);
-        String exp = getExpressionInString(copiedExpString);
+        String exp = getClassNameInExpression(copiedExpString);
         String arguments = getArgumentsInString(copiedExpString);
         return EchoExpressionFactory.newInstance(expString, exp, value, arguments);
     }
 
+    /**
+     * Get class arguments in the expression
+     *
+     * @param expString
+     * @return
+     */
     //{exp(args, args...):value} => args, args...
     //{exp(args, args...):{exp(args): value}} => args, args...
     String getArgumentsInString(String expString) {
@@ -103,7 +118,8 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
     }
 
     /**
-     * returns expression from the expString.
+     * returns class name from the expression.
+     *
      * eg -> exp(args, args...):[value|{exp}] => exp
      * eg -> exp:[value|{exp}] => exp
      * eg -> exp => exp
@@ -111,7 +127,7 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
      * @param expString
      * @return
      */
-    String getExpressionInString(String expString) {
+    String getClassNameInExpression(String expString) {
         expString = expString.trim();
         if (isWrapped(expString, OPEN_BRACKET, CLOSE_BRACKET))
             expString = stripOffWrapper(expString, OPEN_BRACKET, CLOSE_BRACKET);
@@ -152,6 +168,12 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
         return -1;
     }
 
+    /**
+     * does the raw string have echo expression?
+     *
+     * @param line
+     * @return
+     */
     public boolean hasEchoExpressionInLine(String line) {
         if (Strings.isBlank(line)) return false;
         if (line.contains("\n")) throw new IllegalArgumentException(
@@ -160,7 +182,7 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
     }
 
     //bug
-    public String getEchoExpressionInLine(String line) {
+    public String getFirstEchoExpressionInLine(String line) {
         Matcher matcher = LINE_PATTERN.matcher(line);
         if (!matcher.find())
             throw new IllegalArgumentException(String.format("Cannot find Echo Expression from %s", line));

@@ -8,16 +8,16 @@ import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
 
-public class ExpressionEngine {
+public class SimpleExpressionEngine implements WikiExpressionEngine {
 
     private static final EchoExpressionParser echoParser = new EchoExpressionParser();
     private static final ScopeExpressionParser scopeParser = new ScopeExpressionParser();
 
-    public List<ParagraphContext> encodingDocument(String rawText) {
+    public List<Paragraph> encodingDocument(String rawText) {
         checkArgument(rawText != null);
         if (Strings.isBlank(rawText))
             return Collections.emptyList();
-        List<ParagraphContext> paragraphContexts = new ArrayList<>();
+        List<Paragraph> paragraphContexts = new ArrayList<>();
         String[] lines = rawText.split("[\n]");
         for (int start=0; start<lines.length; ) {
             String line = lines[start];
@@ -53,13 +53,13 @@ public class ExpressionEngine {
         return paragraphContexts;
     }
 
-    public ParagraphContext encodingParagraph(String rawText) {
+    Paragraph encodingParagraph(String rawText) {
         Map<String, Expression> mapper = new LinkedHashMap<>();
         String[] lines = rawText.split("\n");
         String[] encodedLines = new String[lines.length];
         ScopeExpression scopeExpression = scopeParser.parse(rawText);
         if (scopeExpression instanceof ParagraphScopeExpression) {
-            String scopeExp = scopeParser.getEchoExpressionInString(lines[0]);
+            String scopeExp = scopeParser.getWrappedStringInScopeExpression(lines[0]);
             encodedLines[0] = Pattern.compile(scopeExp, Pattern.LITERAL)
                     .matcher(lines[0])
                     .replaceFirst(Matcher.quoteReplacement("[@paragraph]"));
@@ -69,7 +69,7 @@ public class ExpressionEngine {
         int expressionId = 0;
         if (scopeExpression.closed()) {
             end--;
-            String scopeExp = scopeParser.getEchoExpressionInString(lines[end]);
+            String scopeExp = scopeParser.getWrappedStringInScopeExpression(lines[end]);
             encodedLines[end] = Pattern.compile(scopeExp, Pattern.LITERAL)
                     .matcher(lines[end])
                     .replaceFirst(Matcher.quoteReplacement("[/@paragraph]"));
@@ -78,7 +78,7 @@ public class ExpressionEngine {
             String line = lines[start];
             encodedLines[start] = line;
             while (echoParser.hasEchoExpressionInLine(line)) {
-                String expression = echoParser.getEchoExpressionInLine(line);
+                String expression = echoParser.getFirstEchoExpressionInLine(line);
                 Expression innerExpression = echoParser.parse(expression);
                 scopeExpression.addExpression(innerExpression);
                 String encodedId = String.format("[@echo%d]", expressionId++);
@@ -88,7 +88,7 @@ public class ExpressionEngine {
                 encodedLines[start] = line;
             }
         }
-        return new SimpleParagraphContext(lines, encodedLines, scopeExpression, mapper);
+        return new SimpleParagraph(lines, encodedLines, scopeExpression, mapper);
     }
 
 
@@ -157,4 +157,9 @@ public class ExpressionEngine {
             "\n" +
             "== 계급 ==\n" +
             "[[파일:52512339.1.jpg]]";
+
+    @Override
+    public List<Paragraph> encoding(String rawText) {
+        return null;
+    }
 }

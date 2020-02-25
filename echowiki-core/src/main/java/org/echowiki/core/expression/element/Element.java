@@ -1,8 +1,6 @@
 package org.echowiki.core.expression.element;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * The class {@link Element} represents the rendered elements according to the Echo Wiki Expression syntax from the raw string.
@@ -13,26 +11,19 @@ import java.util.Set;
 public interface Element {
 
     /**
-     * returns the type {@link ElementType} of the given {@link Element}
+     * returns the type {@link Scope} of the given {@link Element}
      *
      * @return
-     * @see ElementType
+     * @see Scope
      */
-    ElementType type();
+    Scope type();
 
     /**
-     * @param attribute
-     */
-    void addAttribute(Attribute attribute);
-
-    /**
-     * returns the {@link Map} which is grouped by the {@link AttributeType}
      *
-     * @see Attribute
-     * @see AttributeType
-     * @return
+     * @throws IllegalArgumentException if {@code key == null}
      */
-    Map<AttributeType, Set<Attribute>> attributeGroups();
+    void addValue(String key, String value);
+
 
     /**
      * returns all attributes of the given {@link Element}
@@ -42,21 +33,14 @@ public interface Element {
     List<Attribute> attributes();
 
     /**
-     * returns the attribute of the given {@link AttributeType} and key.
+     * returns the attribute of the given {@link Attribute} and key.
      *
      * @throws IllegalArgumentException {@code type == null || key == null}
-     * @param type
      * @param key
      * @return
      */
-    List<Attribute> getAttributes(AttributeType type, String key);
+    Attribute getAttribute(String key);
 
-    /**
-     * returns attributes which in the given {@link AttributeType}
-     *
-     * @param type
-     * @return
-     */
-    List<Attribute> attributes(AttributeType type);
+    Attribute getAttribute(WIKI wiki);
 
 }

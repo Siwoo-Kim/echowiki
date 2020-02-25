@@ -1,15 +1,13 @@
 package org.echowiki.core.expression;
 
 import lombok.AllArgsConstructor;
-import org.echowiki.core.expression.element.Attribute;
-import org.echowiki.core.expression.element.Element;
-import org.echowiki.core.expression.element.AttributeType;
-import org.echowiki.core.expression.element.ElementType;
+import org.echowiki.core.expression.element.*;
 import org.junit.Test;
 
 import java.beans.PropertyChangeEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -28,8 +26,13 @@ public class UnitTestAbstractExpression {
             }
 
             @Override
-            protected ElementType getElementType() {
-                return ElementType.ECHO;
+            protected Scope getElementType() {
+                return Scope.LINE;
+            }
+
+            @Override
+            String[] identifiers() {
+                return new String[0];
             }
 
             @Override
@@ -43,8 +46,13 @@ public class UnitTestAbstractExpression {
             }
 
             @Override
-            protected ElementType getElementType() {
-                return ElementType.ECHO;
+            protected Scope getElementType() {
+                return Scope.LINE;
+            }
+
+            @Override
+            String[] identifiers() {
+                return new String[0];
             }
 
             @Override
@@ -58,8 +66,13 @@ public class UnitTestAbstractExpression {
             }
 
             @Override
-            protected ElementType getElementType() {
-                return ElementType.ECHO;
+            protected Scope getElementType() {
+                return Scope.LINE;
+            }
+
+            @Override
+            String[] identifiers() {
+                return new String[0];
             }
 
             @Override
@@ -73,8 +86,13 @@ public class UnitTestAbstractExpression {
             }
 
             @Override
-            protected ElementType getElementType() {
-                return ElementType.ECHO;
+            protected Scope getElementType() {
+                return Scope.LINE;
+            }
+
+            @Override
+            String[] identifiers() {
+                return new String[0];
             }
 
             @Override
@@ -98,12 +116,17 @@ public class UnitTestAbstractExpression {
         AbstractExpression outerMost = new AbstractExpression("{@(한국사):{+:{!color(orange):{!:'This is test'}}}", "@", "{+:{!color(orange):{!:'This is test'}}}", "한국사") {
             @Override
             protected void hookElement(Element el) {
-                el.addAttribute(new TestAttribute("outerMost", "outerMost"));
+                el.addValue("outerMost", "outerMost");
             }
 
             @Override
-            protected ElementType getElementType() {
-                return ElementType.ECHO;
+            protected Scope getElementType() {
+                return Scope.LINE;
+            }
+
+            @Override
+            String[] identifiers() {
+                return new String[0];
             }
 
             @Override
@@ -114,12 +137,17 @@ public class UnitTestAbstractExpression {
         AbstractExpression outer = new AbstractExpression("{@(한국사):{+:{!color(orange):{!:'This is test'}}}", "+", "{!color(orange):{!:'This is test'}}", null) {
             @Override
             protected void hookElement(Element el) {
-                el.addAttribute(new TestAttribute("outer", "outer"));
+                el.addValue("outer", "outer");
             }
 
             @Override
-            protected ElementType getElementType() {
-                return ElementType.ECHO;
+            protected Scope getElementType() {
+                return Scope.LINE;
+            }
+
+            @Override
+            String[] identifiers() {
+                return new String[0];
             }
 
             @Override
@@ -130,12 +158,17 @@ public class UnitTestAbstractExpression {
         AbstractExpression inner = new AbstractExpression("{@(한국사):{+:{!color(orange):{!:'This is test'}}}", "!color", "{!:'This is test'}", "orange") {
             @Override
             protected void hookElement(Element el) {
-                el.addAttribute(new TestAttribute("inner", "inner"));
+                el.addValue("inner", "inner");
             }
 
             @Override
-            protected ElementType getElementType() {
-                return ElementType.ECHO;
+            protected Scope getElementType() {
+                return Scope.LINE;
+            }
+
+            @Override
+            String[] identifiers() {
+                return new String[0];
             }
 
             @Override
@@ -147,12 +180,17 @@ public class UnitTestAbstractExpression {
         AbstractExpression innerMost = new AbstractExpression("{@(한국사):{+:{!color(orange):{!:'This is test'}}}", "!", "'This is test", "orange") {
             @Override
             protected void hookElement(Element el) {
-                el.addAttribute(new TestAttribute("innerMost", "innerMost"));
+                el.addValue("innerMost", "innerMost");
             }
 
             @Override
-            protected ElementType getElementType() {
-                return ElementType.ECHO;
+            protected Scope getElementType() {
+                return Scope.LINE;
+            }
+
+            @Override
+            String[] identifiers() {
+                return new String[0];
             }
 
             @Override
@@ -167,29 +205,10 @@ public class UnitTestAbstractExpression {
         innerMost.addExpression(literal);
         Element element = outerMost.evaluate();
         List<String> keys = element.attributes().stream().map(Attribute::key).collect(Collectors.toList());
-        List<String> values = element.attributes().stream().map(Attribute::value).collect(Collectors.toList());
-        assertThat(keys, hasItems("outerMost", "outer", "inner", "innerMost", "echo-literal"));
-        assertThat(values, hasItems("outerMost", "outer", "inner", "innerMost", "'This is test'"));
+        List<String> values = element.attributes().stream().map(Attribute::values).flatMap(Collection::stream).collect(Collectors.toList());
+        System.out.println(keys);
+        assertThat(keys, hasItems(WIKI.WIKI_LITERAL.key(), "innerMost", "inner", "outer", "outerMost"));
+        assertThat(values, hasItems("'This is test'", "innerMost",  "inner", "outer", "outerMost"));
     }
 
-    @AllArgsConstructor
-    private static class TestAttribute implements Attribute {
-        private final String key;
-        private final String value;
-
-        @Override
-        public AttributeType type() {
-            return null;
-        }
-
-        @Override
-        public String key() {
-            return key;
-        }
-
-        @Override
-        public String value() {
-            return value;
-        }
-    }
 }

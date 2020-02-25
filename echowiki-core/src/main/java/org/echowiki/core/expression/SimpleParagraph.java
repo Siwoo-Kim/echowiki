@@ -6,28 +6,27 @@ import java.util.*;
 
 import static com.google.common.base.Preconditions.*;
 
-public class SimpleParagraphContext implements ParagraphContext {
+public class SimpleParagraph implements Paragraph {
 
     private static final String EXPRESSION_SYMBOL = "[@echo%d]";
     private static final String PARAGRAPH_SYMBOL = "[@paragraph]";
-
     private final String[] decodedLines;
     private final String[] encodedLines;
-    private final ScopeExpression context;
-    private final Element scopeContext;
+    private final ScopeExpression scope;
+    private final Element rootElement;
     private final Map<String, Expression> expressions;
     private final Map<String, Element> elements;
 
-    public SimpleParagraphContext(String[] decodedLines,
-                                  String[] encodedLines,
-                                  ScopeExpression scopeExpression,
-                                  Map<String, Expression> mapper) {
+    public SimpleParagraph(String[] decodedLines,
+                           String[] encodedLines,
+                           ScopeExpression scopeExpression,
+                           Map<String, Expression> mapper) {
         checkArgument(decodedLines.length == encodedLines.length);
         checkArgument(scopeExpression != null);
         this.decodedLines = decodedLines.clone();
         this.encodedLines = encodedLines.clone();
-        this.context = scopeExpression;
-        this.scopeContext = scopeExpression.evaluate();
+        this.scope = scopeExpression;
+        this.rootElement = scopeExpression.evaluate();
         this.expressions = new LinkedHashMap<>(mapper);
         elements = new LinkedHashMap<>();
         for (String key : expressions.keySet()) {
@@ -37,8 +36,8 @@ public class SimpleParagraphContext implements ParagraphContext {
     }
 
     @Override
-    public ScopeExpression getContext() {
-        return context;
+    public Element root() {
+        return rootElement;
     }
 
     @Override
@@ -71,16 +70,16 @@ public class SimpleParagraphContext implements ParagraphContext {
     public Element indexAt(String index) {
         checkNotNull(index);
         if (index.equals(PARAGRAPH_SYMBOL))
-            return scopeContext;
+            return rootElement;
         return elements.get(index);
     }
 
     @Override
     public Iterator<Element> iterator() {
-        return new ParagraphContextIterator();
+        return new ParagraphIterator();
     }
 
-    private class ParagraphContextIterator implements Iterator<Element> {
+    private class ParagraphIterator implements Iterator<Element> {
         private int index = 0;
 
         @Override
