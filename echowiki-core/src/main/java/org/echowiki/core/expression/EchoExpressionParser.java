@@ -19,7 +19,7 @@ public class EchoExpressionParser extends AbstractExpressionParser implements Ex
     //{exp[(args, args..)]?:[value|exp]}
     private static final Pattern ECHO_PATTERN = Pattern.compile("^\\{.+}$");
     //negative lookbehind
-    private static final Pattern LINE_PATTERN = Pattern.compile("(?<!\\\\)\\{.*?[^\\\\]}+");
+    private static final Pattern LINE_PATTERN = Pattern.compile("(?<!\\\\)\\{.*?([^\\\\]})+}?");
 
     static boolean isEchoExpression(String expString) {
         if (Strings.isBlank(expString)) return false;

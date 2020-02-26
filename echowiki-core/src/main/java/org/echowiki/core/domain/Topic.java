@@ -36,10 +36,6 @@ public interface Topic extends Tree<Topic>, Comparable<Topic> {
         }
     }
 
-    public static void main(String[] args) {
-
-    }
-
     /**
      * returns the head of the topic.
      *

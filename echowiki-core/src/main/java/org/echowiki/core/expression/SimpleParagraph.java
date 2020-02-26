@@ -5,25 +5,26 @@ import org.echowiki.core.expression.element.Element;
 import java.util.*;
 
 import static com.google.common.base.Preconditions.*;
+import static org.echowiki.core.expression.StringHelper.NEW_LINE;
 
 public class SimpleParagraph implements Paragraph {
 
     private static final String EXPRESSION_SYMBOL = "[@echo%d]";
     private static final String PARAGRAPH_SYMBOL = "[@paragraph]";
-    private final String[] decodedLines;
+    private final String[] rawLines;
     private final String[] encodedLines;
     private final ScopeExpression scope;
     private final Element rootElement;
     private final Map<String, Expression> expressions;
     private final Map<String, Element> elements;
 
-    public SimpleParagraph(String[] decodedLines,
+    public SimpleParagraph(String[] rawLines,
                            String[] encodedLines,
                            ScopeExpression scopeExpression,
                            Map<String, Expression> mapper) {
-        checkArgument(decodedLines.length == encodedLines.length);
+        checkArgument(rawLines.length == encodedLines.length);
         checkArgument(scopeExpression != null);
-        this.decodedLines = decodedLines.clone();
+        this.rawLines = rawLines.clone();
         this.encodedLines = encodedLines.clone();
         this.scope = scopeExpression;
         this.rootElement = scopeExpression.evaluate();
@@ -47,12 +48,22 @@ public class SimpleParagraph implements Paragraph {
 
     @Override
     public String encodedString() {
-        return String.join("", encodedLines);
+        return concatLines(encodedLines);
     }
 
     @Override
-    public String decodedString() {
-        return String.join("", decodedLines);
+    public String rawString() {
+        return concatLines(rawLines);
+    }
+
+    private String concatLines(String[] lines) {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0; i<lines.length; i++) {
+            sb.append(lines[i]);
+            if (i != lines.length-1)
+                sb.append(NEW_LINE);
+        }
+        return sb.toString();
     }
 
     @Override

@@ -22,8 +22,8 @@ public final class Elements {
         switch (scope) {
             case LINE:
             case COMMON:
-                return new EchoElement();
-            case SECTION: return new ScopeElement();
+                return new LineElement();
+            case SECTION: return new SectionElement();
         }
         throw new UnsupportedOperationException();
     }

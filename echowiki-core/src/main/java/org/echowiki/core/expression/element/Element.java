@@ -19,6 +19,9 @@ public interface Element {
     Scope type();
 
     /**
+     * Add the value (a pair of {name=data}) with the given key in the {@link Attribute}.
+     * Note that if key already contains same name of pair with the given value,
+     * it will overwrite on the old pair.
      *
      * @throws IllegalArgumentException if {@code key == null}
      */

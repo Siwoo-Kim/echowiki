@@ -1,6 +1,6 @@
 package org.echowiki.core.expression.element;
 
-public class EchoElement extends AbstractElement implements Element {
+public class LineElement extends AbstractElement implements Element {
 
     @Override
     public Scope type() {

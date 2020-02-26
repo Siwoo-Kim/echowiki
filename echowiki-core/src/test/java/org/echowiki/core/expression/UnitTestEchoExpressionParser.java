@@ -215,5 +215,9 @@ public class UnitTestEchoExpressionParser {
         line = "이 문법은 글자의 배경에 {+:{!:'주석'}}을 넣는 기능입니다. {@(Help Document):도움말}들을 찾아서 입력해 주세요.";
         result = echoExpressionParser.getFirstEchoExpressionInLine(line);
         assertEquals(result, "{+:{!:'주석'}}");
+        line = "을 찾아서 입력해 주세요. {!:'{!bgcolor(red):주의}'}";
+        result = echoExpressionParser.getFirstEchoExpressionInLine(line);
+        assertEquals(result, "{!:'{!bgcolor(red):주의}'}");
     }
+
 }

@@ -4,6 +4,11 @@ import org.echowiki.core.expression.element.WIKI;
 import org.echowiki.core.expression.element.Element;
 import org.echowiki.core.expression.element.Scope;
 
+/**
+ * The class {@link LiteralExpression} represents the literal expression in the wiki syntax.
+ *
+ * meta data format {literal=[literal value]}
+ */
 public class LiteralExpression extends AbstractExpression {
 
     private static final WIKI WIKI_LITERAL = WIKI.WIKI_LITERAL;
@@ -19,7 +24,7 @@ public class LiteralExpression extends AbstractExpression {
 
     @Override
     protected void hookElement(Element el) {
-        el.addValue(WIKI_LITERAL.key(), value());
+        el.addValue(WIKI_LITERAL.key(), "literal=" + getLiteral());
     }
 
     @Override

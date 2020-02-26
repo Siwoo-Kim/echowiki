@@ -1,25 +1,23 @@
 package org.echowiki.core.entity;
 
 import com.google.common.base.Strings;
-import com.google.common.hash.Hashing;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.echowiki.core.domain.Auditable;
 import org.echowiki.core.domain.Document;
-import org.echowiki.core.domain.EventTime;
 import org.echowiki.core.domain.Revision;
 import org.echowiki.core.meta.Persistable;
-import org.omg.CORBA.FREE_MEM;
 
 import javax.persistence.*;
 
 import java.util.Objects;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 
 @Getter
@@ -29,14 +27,15 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 @Table(name = "revision")
 public class EntityRevision  implements Revision, Auditable, Persistable {
 
-    private static final String TRUNK_VERSION = "rev{1}";
-    private static final String REVISION_FORMAT = "rev{%d}";
+    private static final Pattern REVISION_PATTERN = Pattern.compile("r(\\d+)");
+    private static final String ROOT_VERSION = "r1";
+    private static final String REVISION_FORMAT = "r%d";
     private static final int FIRST_REVISION = 1;
 
     @Id @GeneratedValue
     private Long id;
 
-    private String version;
+    private String revision;
 
     @OneToOne
     @JoinColumn(name = "next_id")
@@ -54,11 +53,11 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
 
     private String message;
 
-    public static EntityRevision newMasterInstance(Document document, String commitBy, String message) {
+    public static EntityRevision newRoot(Document document, String commitBy, String message) {
         checkNotNull(document);
         checkArgument(!Strings.isNullOrEmpty(commitBy));
         return new EntityRevision(null,
-                String.format(REVISION_FORMAT, FIRST_REVISION),
+                ROOT_VERSION,
                 null,
                 (EntityDocument) document,
                 commitBy,
@@ -77,7 +76,7 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
         checkNotNull(trunk);
         checkArgument(!Strings.isNullOrEmpty(commitBy));
         checkArgument(trunk.isTrunk(), String.format("Given [%s] is not trunk.", trunk));
-        int trunkIndex = getVersionIndex(trunk.getVersion());
+        int trunkIndex = getRevisionIndex(trunk.getRevision());
         EntityRevision entity = (EntityRevision) trunk;
 
         EntityRevision instance = new EntityRevision(null,
@@ -90,24 +89,28 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
         return instance;
     }
 
-    private static int getVersionIndex(String version) {
-        checkArgument(!Strings.isNullOrEmpty(version));
-        return Integer.parseInt(version.substring(version.indexOf("{")+1, version.indexOf("}")));
-    }
-
-    @Override
-    public boolean isHead() {
-        return next == null;
+    private static int getRevisionIndex(String revision) {
+        checkArgument(!Strings.isNullOrEmpty(revision));
+        Matcher matcher = REVISION_PATTERN.matcher(revision);
+        if (!matcher.find())
+            throw new IllegalArgumentException(
+                    String.format("Given Revision [%s] has wrong format. Format should be r[digit]", revision));
+        return Integer.parseInt(matcher.group(1));
     }
 
     @Override
     public boolean isTrunk() {
-        return TRUNK_VERSION.equals(version);
+        return next == null;
     }
 
     @Override
-    public String getVersion() {
-        return version;
+    public boolean isRoot() {
+        return ROOT_VERSION.equals(revision);
+    }
+
+    @Override
+    public String getRevision() {
+        return revision;
     }
 
     @Override
@@ -117,7 +120,7 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
 
     @Override
     public String getMessage() {
-        return null;
+        return message;
     }
 
     @Override
@@ -126,21 +129,19 @@ public class EntityRevision  implements Revision, Auditable, Persistable {
         if (o == null || getClass() != o.getClass()) return false;
         EntityRevision that = (EntityRevision) o;
         return Objects.equals(id, that.id) &&
-                Objects.equals(version, that.version) &&
-                Objects.equals(next, that.next) &&
-                Objects.equals(commitBy, that.commitBy);
+                Objects.equals(revision, that.revision);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, version, next, commitBy);
+        return Objects.hash(id, revision);
     }
 
     @Override
     public String toString() {
         return "EntityRevision{" +
                 "id=" + id +
-                ", version='" + version + '\'' +
+                ", version='" + revision + '\'' +
                 ", master=" + next +
                 ", commitBy='" + commitBy + '\'' +
                 '}';

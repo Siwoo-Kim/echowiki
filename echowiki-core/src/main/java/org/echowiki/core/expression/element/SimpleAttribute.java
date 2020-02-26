@@ -4,15 +4,18 @@ import lombok.EqualsAndHashCode;
 import lombok.ToString;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static com.google.common.base.Preconditions.checkNotNull;
 
 @EqualsAndHashCode(of = "key")
 @ToString(of = "key")
 public class SimpleAttribute implements Attribute {
+    private static final String KEY_VALUE_SEPARATOR = "=";
     private final String key;
-    private final List<String> values = new ArrayList<>();
+    private final Map<String, String> values = new HashMap<>();
 
     SimpleAttribute(String key) {
         this.key = key;
@@ -30,12 +33,15 @@ public class SimpleAttribute implements Attribute {
 
     public void addValue(String value) {
         checkNotNull(value);
-        if (!values.contains(value))
-            values.add(value);
+        int indexOfKey = value.indexOf(KEY_VALUE_SEPARATOR);
+        if (indexOfKey == -1)
+            throw new IllegalArgumentException();
+        String key = value.substring(0, indexOfKey);
+        values.put(key, value);
     }
 
     @Override
     public List<String> values() {
-        return new ArrayList<>(values);
+        return new ArrayList<>(values.values());
     }
 }

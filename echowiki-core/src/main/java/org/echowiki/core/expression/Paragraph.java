@@ -31,7 +31,7 @@ public interface Paragraph extends Iterable<Element> {
 
     String encodedString();
 
-    String decodedString();
+    String rawString();
 
     String[] encodedLines();
 

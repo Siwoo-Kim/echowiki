@@ -1,16 +1,17 @@
 package org.echowiki.web.controller;
 
-import org.echowiki.core.expression.ExpressionEngine;
-import org.echowiki.core.expression.ParagraphContext;
+import org.echowiki.core.expression.Paragraph;
+import org.echowiki.core.expression.SimpleWikiExpressionEngine;
+import org.echowiki.core.expression.WikiExpressionEngine;
 import org.echowiki.core.manage.CategoryManager;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.inject.Inject;
-import javax.jws.WebParam;
-import javax.servlet.jsp.PageContext;
 import java.util.List;
 
 @Controller
@@ -19,6 +20,7 @@ public class TestController {
 
     @Inject
     private CategoryManager categoryManager;
+    private final WikiExpressionEngine expressionEngine = new SimpleWikiExpressionEngine();
 
     @GetMapping
     public String test(Model model) {
@@ -26,11 +28,9 @@ public class TestController {
         return "test";
     }
 
-    private ExpressionEngine expressionEngine = new ExpressionEngine();
-
     @PostMapping
     public String parsing(@RequestParam(name = "text") String text, Model model) {
-        List<ParagraphContext> paragraphContext = expressionEngine.encodingDocument(text);
+        List<Paragraph> paragraphContext = expressionEngine.encoding(text);
         model.addAttribute("paragraph", paragraphContext);
         return "test";
     }

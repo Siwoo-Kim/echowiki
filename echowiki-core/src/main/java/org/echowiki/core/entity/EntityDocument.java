@@ -5,13 +5,11 @@ import org.echowiki.core.domain.*;
 import org.echowiki.core.meta.Persistable;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.LazyCollection;
-import org.hibernate.annotations.LazyCollectionOption;
-import org.springframework.data.repository.cdi.Eager;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @AllArgsConstructor(access = AccessLevel.PACKAGE)
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
@@ -53,7 +51,7 @@ public class EntityDocument extends AbstractTree<Document> implements Document, 
 
     @Override
     public boolean isTrunk() {
-        return revision.isHead();
+        return revision.isTrunk();
     }
 
     @Override
@@ -89,5 +87,19 @@ public class EntityDocument extends AbstractTree<Document> implements Document, 
     @Override
     public EventTime getEventTime() {
         return eventTime;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        EntityDocument document = (EntityDocument) o;
+        return Objects.equals(id, document.id) &&
+                Objects.equals(title, document.title);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title);
     }
 }

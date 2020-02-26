@@ -83,7 +83,7 @@ public abstract class AbstractTree<E extends Comparable<E>> implements Tree<E> {
         if (child == null) return;
         children().remove(child);
         if (Objects.equals(child.getParent(), this))
-            parent(null);
+            child.setParent(null);
     }
 
     public List<E> getDescendants(Traversal traversal) {

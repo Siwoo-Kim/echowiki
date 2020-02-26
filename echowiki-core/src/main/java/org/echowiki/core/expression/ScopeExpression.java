@@ -9,5 +9,4 @@ public interface ScopeExpression extends Expression {
     List<Expression> getExpressionInScope();
 
     boolean closed();
-
 }

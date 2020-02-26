@@ -19,7 +19,7 @@ create table category (
 create table document (
       id int identity (1, 1) primary key,
       title varchar(250) not null,
-      category_id int not null,
+      category_id int,
       parent_id int,
       created datetime default getdate(),
       updated datetime,
@@ -38,7 +38,7 @@ create table category_document_join (
 create table revision (
     id int identity (1, 1) primary key,
     next_id int,
-    version varchar(100),
+    revision varchar(100),
     document_id int not null,
     commit_by varchar(50) not null,
     message varchar(200) not null,

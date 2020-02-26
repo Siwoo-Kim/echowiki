@@ -46,6 +46,9 @@ public class DatabaseConfiguration {
     @Value("${hibernate.show_sql}")
     private String HIBERNATE_SHOW_SQL;
 
+    @Value("${hibernate.format_sql}")
+    private String HIBERNATE_FORMAT_SQL;
+
     @Bean
     public DataSource getDataSource() {
         BasicDataSource dataSource = new BasicDataSource();
@@ -65,8 +68,8 @@ public class DatabaseConfiguration {
         em.setPackagesToScan(HIBERNATE_ENTITY_PACKAGE);
         Properties properties = new Properties();
         properties.setProperty("hibernate.dialect", HIBERNATE_DIALECT);
-        //properties.setProperty("hibernate.hbm2ddl.auto", HIBERNATE_HBM2DDL_AUTO);
         properties.setProperty("hibernate.show_sql", HIBERNATE_SHOW_SQL);
+        properties.setProperty("hibernate.format_sql", HIBERNATE_FORMAT_SQL);
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         em.setJpaVendorAdapter(vendorAdapter);
         em.setJpaProperties(properties);

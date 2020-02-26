@@ -15,8 +15,8 @@ public enum WIKI {
     WIKI_LITERAL(Scope.LINE, "wiki-literal"),
     WIKI_LINK(Scope.LINE, "wiki-link"),
     WIKI_LIST(Scope.LINE, "wiki-line"),
-    WIKI_NOTE(Scope.LINE, "echo-note"),
-    WIKI_TEXT(Scope.LINE, "echo-text"),
+    WIKI_NOTE(Scope.LINE, "wiki-note"),
+    WIKI_TEXT(Scope.LINE, "wiki-text"),
     WIKI_PARAGRAPH(Scope.SECTION, "wiki-paragraph");
 
     private static final Map<String, WIKI> maps = Arrays.stream(WIKI.values())

@@ -15,9 +15,26 @@ insert into category (title, parent_id, updated, deleted)  VALUES ('조선/인�
 insert into category (title, parent_id, updated, deleted)  VALUES ('조선의 관직', 8, null, null);
 insert into category (title, parent_id, updated, deleted)  VALUES ('조선의 역사', 8, null, null);
 
+insert into category (title, parent_id, updated, deleted)  VALUES ('프로그래밍', null, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('라이브러리', 16, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('웹 프로그래밍', 16, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('프레임워크', 16, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('프로그래밍 언어', 16, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('절차적 언어', 21, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('마크업 언어', 21, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('객체 지향 언어', 21, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('Java', 24, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('Kotlin', 24, null, null);
+insert into category (title, parent_id, updated, deleted)  VALUES ('Scala', 24, null, null);
+
+
+
 
 insert into document (title, category_id, parent_id, created, updated, deleted)
 values ('조선', 8, null, getdate(), null, null);
+
+insert into revision(next_id, revision, document_id, commit_by, message, created, updated, deleted)
+values (null, 'r1', 1, 'Siwoo', 'First Revision', GETDATE(), null, null);
 
 insert into topic (topic_index, heading, parent_id, document_id, created, updated, deleted, paragraph)
 values ('1', '개요', null, 1, GETDATE(), null, null, '조선(朝鮮)은 고려의 뒤를 이어 1392년부터 1897년까지 505년[17]간 한반도와 그 부속 도서를 지배했던 왕조 국가이다. 정치학적으로는 1392년에서 1637년까지 명의 제후국[18]이었으며, 1637년 이후 1897년까지 청의 제후국[19]이었다. 일반적으로 존속년도를 기년할 때는 조선 왕조에 근 13년간 존속한 대한제국까지 포함해 분류하며, 이에 따르면 한국사의 마지막 왕조 국가이자 2020년 현재까지 한반도의 마지막 통일국가이다.
@@ -134,3 +151,28 @@ insert into topic (topic_index, heading, parent_id, document_id, created, update
 values ('7-3', '농업', null, 1, GETDATE(), null, null, '17세기 후반 이후 조선 시대 후반기에는 대토지를 소유한 지주가 늘어 소작제가 일반화되는 현상이 나타난다. 이에 따라 농본주의 사회에서 국가의 대다수를 차지했던 농민은 세금에다 소작료까지 내야하는 이중고에 시달리게 되었다. 이에 실학 같은 양민의 생활 형편을 개선시키려는 노력도 등장한다. 특히 정약용, 이익, 박지원, 반계수록의 저자 유형원 등은 지주를 축소하고 자영농을 육성하기 위해 토지를 지주로부터 농민에게로 분배하는 토지 개혁을 주장했다. 그러나 실학 자체가 조선에서 주류가 아니었던 것도 있고 해서 이들의 주장은 받아들여지지 않았다. 참고로 결국 한반도에서 소작이 사라지는건 8.15 광복 이후다. 북한에서는 농지를 무상으로 몰수하여 무상으로 분배해버렸고, 이후엔 공산주의 국가들이 으레 그러하듯 협동 농장 또는 집단 농장의 형태로 바뀐다. 반대로 자본주의 국가였던 남한에서는 지주로부터 농지를 구입한 뒤[52] 농민에게 장기 분할 납부의 방식으로 팔아서 분배했다. 거기다가 6.25 전쟁으로 지주고 뭐고 평등하게 박살나서 소작도 아작났다. 그리고 현재 대한민국에서 소작은 불법이다.');
 
 
+insert into document (title, category_id, parent_id, created, updated, deleted)
+values ('Java', 25, null, getdate(), null, null);
+
+insert into revision(next_id, revision, document_id, commit_by, message, created, updated, deleted)
+values (null, 'r1', 2, 'Siwoo', 'First Revision', GETDATE(), null, null);
+
+insert into topic (topic_index, heading, parent_id, document_id, created, updated, deleted, paragraph)
+values ('1', '개요', null, 2, GETDATE(), null, null, '== 개요 ==
+[[썬 마이크로시스템즈]]에서 1995년에 개발한 [[객체 지향 프로그래밍|객체 지향]] [[프로그래밍 언어]]. 창시자는 [[제임스 고슬링]]이다. 2010년에 [[오라클(기업)|오라클]]이 [[썬 마이크로시스템즈]]을 인수하면서 Java의 저작권을 소유하였다. 현재는 OpenJDK는 GPL2이나 [[오라클(기업)|오라클]]이 배포하는 Oracle JDK는 상업라이선스로 2019년 1월부터 유료화정책을 강화하고 있다. Java EE는 [[이클립스(통합 개발 환경)|이클립스]] 재단의 소유이다. Java 언어는 J2SE 1.4부터는 Java Community Process (JCP)에서 개발을 주도하고 있다.
+
+C#과 문법적 성향이 굉장히 비슷하며, 그에 비해 2019년 Q3에서 가장 많이 이용하는 언어로 뽑혔다. ''''''Javascript와는 다르다.''''''');
+
+
+insert into topic (topic_index, heading, parent_id, document_id, created, updated, deleted, paragraph)
+values ('2', '어원', null, 2, GETDATE(), null, null, '== 분류 ==
+Java는 크게 다음과 같은 4가지 에디션으로 나뉜다.
+
+ * Java SE(Java Standard Edition / J2SE)
+ 대부분의 사람들이 가장 많이 접하는 표준 에디션. Java의 핵심 API와 기능들을 제공한다. [[JDK]] 항목도 참고.
+ * Jakarta EE, 구 Java EE(Java Enterprise Edition / J2EE)
+ 기업에서 운영하는 서버 페이지에 특화된 에디션이다. [[JSP]]와 서블릿을 비롯한 웹 애플리케이션 서버에 관련된 기술들이 포함되어 있다.
+ * Java ME(Java Micro Edition / J2ME)
+ PDA나 셋톱박스, 센서 등의 [[임베디드 시스템]] 환경에 특화된 에디션이다.
+ * JavaFX
+ 데스크톱 애플리케이션 개발 및 배포를 위한 에디션으로, 크로스플랫폼 이식과 [[GUI]] 라이브러리를 제공한다.');

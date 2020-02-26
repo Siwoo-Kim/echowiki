@@ -5,9 +5,10 @@ import java.util.List;
 /**
  * The class represents the meta data of the {@link Element}.
  * {@link Attribute} has its own key to identify its functionality {@link WIKI} in the view.
+ * Note that the value in the {@link Attribute} is consists of {name=data} format.
  *
  * Meta data could have more than one values for each key.
- * Each data could be consists of {subkey=value} format.
+ * Each data could be consists of {name=data} format.
  *
  * @see Element
  * @see WIKI defined functionality or functoinalities' grouping for the {@link Attribute}

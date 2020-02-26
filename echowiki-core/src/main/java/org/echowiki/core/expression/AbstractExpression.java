@@ -105,7 +105,7 @@ public abstract class AbstractExpression implements Expression, PropertyChangeLi
         while (e != null && !(e instanceof LiteralExpression))
             e = e.innerExpression();
         if (e != null)
-            return e.value();
+            return e.expressionString();
         else
             return null;
     }

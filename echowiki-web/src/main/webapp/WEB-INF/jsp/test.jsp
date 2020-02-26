@@ -31,6 +31,12 @@
 </style>
 <body>
 <div class="container">
+    문서 이름:
+    <input type="text" class="text-input" name="document_id">
+    문서 위치:
+
+</div>
+<div class="container">
     <div class="row">
         <div class="col-6">
             <form action="/test" method="post">
@@ -48,7 +54,7 @@
                         <hr>
                         ${p.encodedString()}
                         <hr>
-                        ${p.decodedString()}
+                        ${p.rawString()}
                     </c:if>
                 </pre>
             </div>
