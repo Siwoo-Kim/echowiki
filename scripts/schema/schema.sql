@@ -1,64 +1,59 @@
-drop table revision;
-drop table category_document_join;
+drop table namespace;
+drop table document_commit;
 drop table document;
+drop table category_join;
 drop table category;
-drop table topic;
 
+
+create table namespace (
+    name varchar(255) primary key
+);
 
 -- CATEGORY TABLE
 create table category (
       id int identity(1, 1) primary key,
-      title varchar(50) not null unique,
-      parent_id int,
+      name varchar(50) not null,
+      namespace varchar(255) not null,
       created datetime default getdate(),
       updated datetime,
       deleted datetime,
-      constraint category_parent_fk foreign key (parent_id) references category(id)
 );
+
+-- Unique for two columns
+create unique index category_name_unique on category (namespace, name);
+
+create table category_join (
+    parent_id int references category(id),
+    child_id int references category(id),
+    primary key (parent_id, child_id),
+    constraint ck_category_ref_itself check (parent_id <> child_id)
+)
 
 create table document (
       id int identity (1, 1) primary key,
-      title varchar(250) not null,
+      name varchar(250) not null,   --should be null but handled in applicaiton level
+      content varchar(max),
       category_id int,
-      parent_id int,
       created datetime default getdate(),
       updated datetime,
       deleted datetime,
-      constraint document_category_fk foreign key (category_id) references category(id),
+      constraint fk_document_category foreign key (category_id) references category(id)
 );
 
-create table category_document_join (
-    document_id int,
-    category_id int,
-    primary key (document_id, category_id),
-    constraint category_document_join_document_fk foreign key (document_id) references document(id),
-    constraint category_document_join_category_fk foreign key (category_id) references category(id)
-);
-
-create table revision (
+create table document_commit (
     id int identity (1, 1) primary key,
-    next_id int,
-    revision varchar(100),
+    commit_index int,
+    previous_id int,
     document_id int not null,
-    commit_by varchar(50) not null,
-    message varchar(200) not null,
+    trunk bit not null,
     created datetime default getdate(),
     updated datetime,
     deleted datetime,
-    constraint revision_master_fk foreign key (next_id) references revision(id),
-    constraint document_revision_fk foreign key (document_id) references document(id)
+    constraint fk_commit_previous foreign key (previous_id) references document_commit(id),
+    constraint fk_document_commit foreign key (document_id) references document(id)
 );
 
-create table topic (
-    id int identity (1, 1) primary key,
-    topic_index varchar(100) not null,
-    heading varchar(100) not null,
-    parent_id int,
-    document_id int not null,
-    paragraph varchar(max),
-    created datetime default getdate(),
-    updated datetime,
-    deleted datetime,
-    constraint topic_parent_fk foreign key (parent_id) references topic(id),
-    constraint topic_document_fk foreign key (document_id) references topic(id),
-);
+insert into namespace values ('일반');
+insert into namespace values ('사용자');
+insert into namespace values ('에코위키');
+insert into namespace values ('템플릿');

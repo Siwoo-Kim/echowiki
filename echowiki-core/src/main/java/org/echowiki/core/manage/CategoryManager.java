@@ -1,11 +1,12 @@
 package org.echowiki.core.manage;
 
 import org.echowiki.core.domain.Category;
-
-import java.util.List;
+import org.echowiki.core.domain.NameSpace;
 
 public interface CategoryManager {
 
-    List<Category> getRoots();
+    Category getCategory(String name, NameSpace nameSpace);
+
+    Category save(Category category);
 
 }

@@ -1,87 +1,78 @@
 package org.echowiki.core.entity;
 
-import lombok.*;
-import org.echowiki.core.domain.*;
-import org.echowiki.core.meta.Persistable;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
+import org.echowiki.core.check.Check;
+import org.echowiki.core.domain.Category;
+import org.echowiki.core.domain.Commit;
+import org.echowiki.core.domain.Document;
+import org.echowiki.core.domain.EventTime;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@AllArgsConstructor(access = AccessLevel.PACKAGE)
+import static com.google.common.base.Preconditions.checkArgument;
+
 @NoArgsConstructor(access = AccessLevel.PACKAGE)
-@Entity(name = "Document")
-@Table(name = "document")
-@Builder
-public class EntityDocument extends AbstractTree<Document> implements Document, Auditable, Persistable {
+@Entity(name = "Document") @Table(name = "document")
+public class EntityDocument implements Document, Check<Document> {
+
+    @Column(unique = true)
+    String name;
+    @Basic(fetch = FetchType.LAZY)
+    String content;
+    @ManyToOne(targetEntity = EntityCategory.class)
+    @JoinColumn(name = "category_id")
+    Category category;
+    @OneToOne(targetEntity = EntityCommit.class,
+            mappedBy = "document")
+    Commit commit;
 
     @Id
     @GeneratedValue
     private Long id;
-
-    private String title;
-
-    @ManyToMany
-    @JoinTable(name = "category_document",
-            joinColumns = @JoinColumn(name = "document_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id"))
-    @JoinColumn(name = "category_id")
-    private List<EntityCategory> categories;
-
-    @OneToOne(mappedBy = "document")
-    private EntityRevision revision;
-
-    @OneToMany(mappedBy = "document", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    private List<EntityTopic> topics;
-
-    @ManyToOne
-    @JoinColumn(name = "parent_id")
-    private EntityDocument parent;
-
-    @OneToMany(mappedBy = "parent", fetch = FetchType.EAGER)
-    @Fetch(FetchMode.SUBSELECT)
-    private List<EntityDocument> children;
-
     @Embedded
-    private EventTime eventTime;
+    private EntityEventTime eventTime;
 
-    @Override
-    public boolean isTrunk() {
-        return revision.isTrunk();
+    EntityDocument(String name, String content, Category category, Commit commit) {
+        this.name = name;
+        this.content = content;
+        this.category = category;
+        if (category != null)
+            category.addDocument(this);
+        ((EntityCommit) commit).document = this;
+        this.commit = commit;
+        eventTime = EntityEventTime.newEventTime();
     }
 
     @Override
-    public List<Topic> getTopics() {
-        return null;
+    public String getName() {
+        return name;
     }
 
     @Override
-    public String getTitle() {
-        return title;
+    public String getContent() {
+        return content;
     }
 
     @Override
-    public List<Category> getCategories() {
-        return new ArrayList<>(categories);
+    public Category getCategory() {
+        return category;
+    }
+
+    void setCategory(Category category) {
+        this.category = category;
     }
 
     @Override
-    Tree<?> parent() {
-        return parent;
+    public Commit getCommit() {
+        return commit;
     }
 
     @Override
-    List children() {
-        return children;
-    }
-
-    @Override
-    void parent(Tree<? extends Document> parent) {
-        this.parent = (EntityDocument) parent;
+    public boolean isLoner() {
+        return category == null;
     }
 
     @Override
@@ -90,16 +81,26 @@ public class EntityDocument extends AbstractTree<Document> implements Document, 
     }
 
     @Override
+    public List<Document> getLinks() {
+        checkArgument(isLoner(), String.format("Loner Document [%s] doesn't have linked documents.", getName()));
+        List<Document> documents = category.getDocuments();
+        assert documents.contains(this);
+        documents.remove(this);
+        return documents;
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         EntityDocument document = (EntityDocument) o;
         return Objects.equals(id, document.id) &&
-                Objects.equals(title, document.title);
+                Objects.equals(name, document.name) &&
+                Objects.equals(commit, document.commit);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, title);
+        return Objects.hash(id, name, commit);
     }
 }

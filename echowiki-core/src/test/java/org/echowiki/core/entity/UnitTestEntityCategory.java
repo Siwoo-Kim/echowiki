@@ -1,207 +1,88 @@
 package org.echowiki.core.entity;
 
-import org.echowiki.core.configuration.CoreConfiguration;
-import org.echowiki.core.configuration.DatabaseConfiguration;
-import org.echowiki.core.domain.Category;
-import org.echowiki.core.domain.Tree;
-import org.echowiki.core.entity.EntityCategory;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringRunner;
 
+import java.io.BufferedInputStream;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.List;
 
-import static org.hamcrest.CoreMatchers.hasItems;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.*;
 
-@RunWith(SpringRunner.class)
-@ContextConfiguration(classes = {CoreConfiguration.class, DatabaseConfiguration.class})
 public class UnitTestEntityCategory {
 
-    @Test
-    public void unitTestAddChildAndSetParent() {
-        Category parent = EntityCategory.builder()
-                .id(1L)
-                .title("TEST1")
-                .build();
-        Category child_level2_1 = EntityCategory.builder()
-                .id(2L)
-                .title("TEST2-1")
-                .build();
+    private static final String MOCK_JSON = ClassLoader.getSystemClassLoader().getResource("./mock/entity_category_mock.json").getFile();
+    private List<EntityCategory> MOCK;
 
-        parent.addChild(child_level2_1);
-        assertThat(parent.getChildren(), hasItems(child_level2_1));
-        assertEquals(child_level2_1.getParent(), parent);
-
-        Category child_level2_2 = EntityCategory.builder()
-                .id(3L)
-                .title("TEST2-2")
-                .build();
-        child_level2_2.setParent(parent);
-
-        assertThat(parent.getChildren(), hasItems(child_level2_1));
-        assertThat(parent.getChildren(), hasItems(child_level2_2));
-        assertEquals(child_level2_1.getParent(), parent);
-        assertEquals(child_level2_2.getParent(), parent);
-
-        Category child_level3_1 = EntityCategory.builder()
-                .id(4L)
-                .title("TEST3-1")
-                .build();
-        child_level2_1.addChild(child_level3_1);
-
-        assertThat(parent.getChildren(), hasItems(child_level2_1));
-        assertThat(parent.getChildren(), hasItems(child_level2_2));
-        assertThat(child_level2_1.getChildren(), hasItems(child_level3_1));
-        assertEquals(child_level2_1.getParent(), parent);
-        assertEquals(child_level2_2.getParent(), parent);
-        assertEquals(child_level3_1.getParent(), child_level2_1);
-
-        Category child_level3_2 = EntityCategory.builder()
-                .id(5L)
-                .title("TEST3-2")
-                .build();
-        child_level2_2.addChild(child_level3_2);
-
-        assertThat(parent.getChildren(), hasItems(child_level2_1));
-        assertThat(parent.getChildren(), hasItems(child_level2_2));
-        assertThat(child_level2_1.getChildren(), hasItems(child_level3_1));
-        assertThat(child_level2_2.getChildren(), hasItems(child_level3_2));
-        assertEquals(child_level2_1.getParent(), parent);
-        assertEquals(child_level2_2.getParent(), parent);
-        assertEquals(child_level3_1.getParent(), child_level2_1);
-        assertEquals(child_level3_2.getParent(), child_level2_2);
-        assertTrue(child_level3_1.isLeaf());
-        assertTrue(child_level3_2.isLeaf());
-
-        assertEquals(child_level3_1.getRoot(), parent);
+    @Before
+    public void setup() throws IOException {
+        ObjectMapper mapper = new ObjectMapper();
+        try (InputStream in = new BufferedInputStream(new FileInputStream(MOCK_JSON))) {
+            this.MOCK = mapper.readValue(in, new TypeReference<List<EntityCategory>>() {
+            });
+        }
     }
 
     @Test
-    public void unitTestIsRootAndGetRoot() {
-        Category parent = EntityCategory.builder()
-                .id(1L)
-                .title("TEST1")
-                .build();
-        Category child_level2_1 = EntityCategory.builder()
-                .id(2L)
-                .title("TEST2-1")
-                .build();
-        Category child_level2_2 = EntityCategory.builder()
-                .id(3L)
-                .title("TEST2-2")
-                .build();
+    public void unitTestAddChild() {
+        EntityCategory parent = MOCK.get(0);
+        EntityCategory child = MOCK.get(1);
+        EntityCategory grandChild = MOCK.get(2);
 
-        parent.addChild(child_level2_1);
-        parent.addChild(child_level2_2);
+        //when
+        parent.addChild(child);
 
-        assertTrue(parent.isRoot());
-        assertFalse(child_level2_1.isRoot());
-        assertFalse(child_level2_2.isRoot());
-        assertEquals(child_level2_1.getRoot(), parent);
-        assertEquals(child_level2_2.getRoot(), parent);
+        assertTrue(parent.hasChild(child));
+        assertTrue(child.hasParent(parent));
+        assertEquals(parent.getChildren().size(), 1);
+        assertEquals(child.getParents().size(), 1);
 
-        Category child_level3_1 = EntityCategory.builder()
-                .id(4L)
-                .title("TEST3-1")
-                .build();
-        child_level2_1.addChild(child_level3_1);
-        Category child_level3_2 = EntityCategory.builder()
-                .id(5L)
-                .title("TEST3-2")
-                .build();
-        child_level2_2.addChild(child_level3_2);
+        //when
+        child.addChild(grandChild);
 
-        assertTrue(parent.isRoot());
-        assertFalse(child_level2_1.isRoot());
-        assertFalse(child_level2_2.isRoot());
-        assertFalse(child_level3_1.isRoot());
-        assertFalse(child_level3_2.isRoot());
-        assertEquals(child_level2_1.getRoot(), parent);
-        assertEquals(child_level2_2.getRoot(), parent);
-        assertEquals(child_level3_1.getRoot(), parent);
-        assertEquals(child_level3_2.getRoot(), parent);
+        assertTrue(child.hasChild(grandChild));
+        assertTrue(grandChild.hasParent(child));
+        assertEquals(child.getChildren().size(), 1);
+        assertEquals(grandChild.getParents().size(), 1);
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void unitTestAddChildWhenRefItself() {
+        MOCK.get(0).addChild(MOCK.get(0));
+    }
 
     @Test
     public void unitTestRemoveChild() {
-        Category parent = EntityCategory.builder()
-                .id(1L)
-                .title("TEST1")
-                .build();
-        Category child_level2_1 = EntityCategory.builder()
-                .id(2L)
-                .title("TEST2-1")
-                .build();
-        Category child_level2_2 = EntityCategory.builder()
-                .id(3L)
-                .title("TEST2-2")
-                .build();
+        EntityCategory parent = MOCK.get(0);
+        EntityCategory child1 = MOCK.get(1);
+        EntityCategory child2 = MOCK.get(2);
+        EntityCategory grandChild1 = MOCK.get(3);
+        EntityCategory grandChild2 = MOCK.get(4);
 
-        parent.removeChild(child_level2_1);
-        assertThat(parent.getChildren(), not(hasItems(child_level2_1)));
-        assertNull(child_level2_1.getParent());
+        parent.addChild(child1);
+        parent.addChild(child2);
+        child1.addChild(grandChild1);
+        child1.addChild(grandChild2);
 
-        parent.addChild(child_level2_1);
-        parent.addChild(child_level2_2);
+        //when
+        parent.removeChild(child1);
 
-        parent.removeChild(child_level2_1);
-        assertThat(parent.getChildren(), not(hasItems(child_level2_1)));
-        assertThat(parent.getChildren(), hasItems(child_level2_2));
-        assertNull(child_level2_1.getParent());
-        assertEquals(child_level2_2.getParent(), parent);
-    }
+        assertFalse(parent.hasChild(child1));
+        assertTrue(parent.hasChild(child2));
+        assertFalse(child1.hasParent(parent));
+        assertTrue(child2.hasParent(parent));
 
-    @Test
-    public void unitTestGetDescendants() {
-        Category parent = EntityCategory.builder()
-                .id(1L)
-                .title("TEST1")
-                .build();
-        Category child_level2_1 = EntityCategory.builder()
-                .id(2L)
-                .title("TEST2-1")
-                .build();
-        Category child_level2_2 = EntityCategory.builder()
-                .id(3L)
-                .title("TEST2-2")
-                .build();
-        Category child_level2_3 = EntityCategory.builder()
-                .id(3L)
-                .title("TEST2-3")
-                .build();
-        Category child_level3_1 = EntityCategory.builder()
-                .id(4L)
-                .title("TEST3-1")
-                .build();
-        Category child_level3_2 = EntityCategory.builder()
-                .id(5L)
-                .title("TEST3-2")
-                .build();
-        Category child_level3_3 = EntityCategory.builder()
-                .id(6L)
-                .title("TEST3-3")
-                .build();
-        Category child_level3_4 = EntityCategory.builder()
-                .id(7L)
-                .title("TEST3-4")
-                .build();
+        //when
+        child1.removeChild(grandChild1);
 
-        parent.addChild(child_level2_1);
-        parent.addChild(child_level2_2);
-        parent.addChild(child_level2_3);
-        child_level2_1.addChild(child_level3_1);
-        child_level2_2.addChild(child_level3_2);
-        child_level2_3.addChild(child_level3_3);
-        child_level2_3.addChild(child_level3_4);
-
-        List<Category> results = parent.getDescendants(Tree.Traversal.LEVEL);
-        assertArrayEquals(results.toArray(new Category[0]),
-                new Category[]{parent, child_level2_1, child_level2_2, child_level2_3,
-                        child_level3_1, child_level3_2, child_level3_3, child_level3_4});
+        assertFalse(child1.hasChild(grandChild1));
+        assertTrue(child1.hasChild(grandChild2));
+        assertFalse(grandChild1.hasParent(child1));
+        assertTrue(grandChild2.hasParent(child1));
     }
 }
+
