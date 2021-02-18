@@ -20,7 +20,7 @@
         <hibernate.version>5.4.11.Final</hibernate.version>
         <log4j.version>2.13.0</log4j.version>
         <tomcat-embed.version>9.0.30</tomcat-embed.version>
-        <jackson.version>2.10.2</jackson.version>
+        <jackson.version>2.12.1</jackson.version>
     </properties>
 
     <dependencies>
