@@ -16,7 +16,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>5.2.3.RELEASE</spring.version>
+        <spring.version>5.2.22.RELEASE</spring.version>
         <hibernate.version>5.4.11.Final</hibernate.version>
         <log4j.version>2.13.0</log4j.version>
         <tomcat-embed.version>9.0.30</tomcat-embed.version>
